@@ -1,0 +1,6 @@
+---
+import Base from '../../layouts/Base.astro';
+import { members } from '../../data/members';
+---
+<Base title="Members"><p class="eyebrow">Team / 04</p><h1>Team members</h1><p class="lead">Individual work and shared research.</p>
+<div class="grid">{members.map(member => <section class="panel"><h3>{member.handle}</h3><div class="actions"><a href={`https://github.com/${member.handle}`}>GitHub ↗</a>{member.site ? <a href={member.site}>Portfolio & blog ↗</a> : <span class="muted">Blog link pending</span>}</div></section>)}</div></Base>

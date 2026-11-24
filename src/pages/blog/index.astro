@@ -1,0 +1,6 @@
+---
+import Base from '../../layouts/Base.astro';
+const posts = Object.values(import.meta.glob('./*.md', { eager: true })).map((p: any) => ({...p.frontmatter,url:p.url})).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+---
+<Base title="Research blog"><p class="eyebrow">Writing / Field notes</p><h1>Research blog</h1><p class="lead">Reviewed team announcements, technical notes and research reports. Individual portfolios are linked on the members page.</p>
+<div class="grid">{posts.map(post => <article class="panel"><p class="eyebrow">{post.date} · {post.category}</p><h3><a href={post.url}>{post.title}</a></h3><p>{post.description}</p></article>)}</div></Base>
