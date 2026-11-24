@@ -1,0 +1,6 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { members } from '../../../data/members';
+---
+<Base title="팀원"><p class="eyebrow">팀 / 04</p><h1>팀원 소개</h1><p class="lead">개별 활동과 공동 연구를 연결합니다.</p>
+<div class="grid">{members.map(member => <section class="panel"><h3>{member.handle}</h3><div class="actions"><a href={`https://github.com/${member.handle}`}>GitHub ↗</a>{member.site ? <a href={member.site}>포트폴리오 및 블로그 ↗</a> : <span class="muted">블로그 링크 확인 중</span>}</div></section>)}</div></Base>

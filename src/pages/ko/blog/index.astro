@@ -1,0 +1,6 @@
+---
+import Base from '../../../layouts/Base.astro';
+const posts = Object.values(import.meta.glob('./*.md', { eager: true })).map((p: any) => ({...p.frontmatter,url:p.url})).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+---
+<Base title="연구 블로그"><p class="eyebrow">기록 / 연구 노트</p><h1>연구 블로그</h1><p class="lead">팀 공지, 검토된 기술 기록과 연구 보고서를 게시합니다. 개인 포트폴리오는 팀원 페이지에서 확인할 수 있습니다.</p>
+<div class="grid">{posts.map(post => <article class="panel"><p class="eyebrow">{post.date} · {post.category}</p><h3><a href={post.url}>{post.title}</a></h3><p>{post.description}</p></article>)}</div></Base>
