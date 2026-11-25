@@ -38,3 +38,341 @@ bounty:
   url: https://www.ekoreanews.co.kr/news/articleView.html?idxno=74087
 tip: 메신저 → 결제 → 모빌리티로 이어지는 계정 연동이 핵심 공격 표면(7). 화재 사례는 물리·이중화 공부의 교과서.
 blog: https://tech.kakao.com/
+deep:
+  summary: 카카오의 서비스가 어떤 인프라 위에 있고, 각 영역에서 무엇이 위험하며, 실제로 어떤 사건이 있었는지를 공개 자료(회사 발표, 정부 발표, 언론 보도)로 정리했습니다. 카카오 내부 구조를 확인한 것은 아니며, 보도만 있는 내용은 문장 안에 표시했습니다.
+  facts:
+    - label: 물리
+      value: 판교 임차 → 자체 데이터센터
+      detail: 2022년 화재 때는 SK C&C 판교 센터에 서버 약 3만2천 대를 둔 구조. 첫 자체 센터인 안산은 2024-01 가동, 남양주 제2센터는 2029 준공 목표
+    - label: 대표 사건
+      value: 2022 판교 화재 장기 장애
+      detail: 배터리실 발화로 UPS까지 멈추고, 운영 도구가 판교 안에만 있어 복구가 늦어짐. 주요 서비스 장애 최대 약 127시간(보도 기준)
+    - label: 개인정보
+      value: 오픈채팅 과징금 151억 원
+      detail: 2024-05 개인정보위 처분(당시 역대 최대). 2026-01 1심에서 카카오 패소, 항소 진행 중(보도 기준)
+    - label: 컨테이너
+      value: 온프레미스 쿠버네티스 대규모 운영
+      detail: CNCF 사례 기준 OpenStack 위에서 클러스터 7천 개 이상, 노드 12만 대 이상을 Cilium으로 운영
+  services:
+    - name: 카카오톡
+      areas:
+        "1": core
+        "2": core
+        "3": related
+        "4": related
+        "5": core
+        "6": core
+        "7": core
+        "10": core
+        "11": core
+        "14": core
+    - name: 오픈채팅
+      areas:
+        "6": core
+        "7": core
+        "12": related
+        "14": core
+    - name: 카카오계정·카카오 로그인
+      areas:
+        "6": related
+        "7": core
+        "12": core
+        "14": core
+    - name: 카카오페이(계열)
+      areas:
+        "6": core
+        "7": core
+        "12": core
+        "14": core
+        "15": core
+    - name: 카카오뱅크(계열)
+      areas:
+        "1": core
+        "4": related
+        "7": core
+        "12": core
+        "14": core
+    - name: 카카오T(카카오모빌리티)
+      areas:
+        "4": core
+        "7": related
+        "9": core
+        "13": core
+        "14": core
+    - name: 카카오맵·카카오내비
+      areas:
+        "2": related
+        "5": core
+        "6": core
+        "13": related
+        "14": core
+    - name: 카카오클라우드
+      areas:
+        "1": core
+        "4": core
+        "5": core
+        "7": core
+        "9": core
+        "12": related
+    - name: 카나나·ChatGPT for Kakao
+      areas:
+        "1": related
+        "7": related
+        "9": related
+        "14": related
+        "15": related
+        "16": core
+    - name: 카카오워크(업무 메신저)
+      areas:
+        "5": core
+        "7": core
+        "8": core
+        "9": related
+        "15": related
+  areas:
+    "1":
+      level: hi
+      here: 2022년까지 메인 서버를 SK C&C 판교 데이터센터(임차)에 둠. 화재 후 첫 자체 센터인 안산(한양대 ERICA 캠퍼스, 서버 12만 대 규모)을 2023-09 준공, 2024-01 가동. UPS실과 배터리실을 방화 격벽으로 나누고 서버·배터리·UPS를 지상층에 둠. 남양주에 제2센터(약 6,000억 원, 2029 준공 목표) 계획.
+      risk: 판교 화재는 지하 3층 배터리실에서 시작됐고 배터리와 UPS가 물리적으로 완전히 분리되지 않아 UPS까지 멈춤(정부 발표). 한 건물에 서버가 몰려 있으면 물리 사고가 곧 전 서비스 장애. 이후 정부는 배터리실 안에 UPS 등 다른 전기설비를 두지 않게 하는 기준을 마련.
+      study: 데이터센터 전력 구조(한전-UPS-발전기), 리튬이온 배터리 열폭주, Active-Active 이중화, 방송통신재난관리 제도.
+      sources:
+        - title: 정부 조사 결과(화재모니터링·백업 미흡)
+          url: https://www.etnews.com/20221206000169
+        - title: 정부 재발 방지 대책(배터리 간격·설비 분리)
+          url: https://www.newsis.com/view/NISX20230330_0002247066
+        - title: 카카오 데이터센터 안산 공개
+          url: https://www.kakaocorp.com/page/detail/11097
+        - title: 카카오 데이터센터 (2) 재해 대비책
+          url: https://www.kakaocorp.com/page/detail/10860
+        - title: 남양주 디지털 허브 협약
+          url: https://www.kakaocorp.com/page/detail/11592
+    "2":
+      level: mid
+      here: 판교 화재 후 데이터센터 간 이중화를 마쳤고, 대용량 트래픽 서비스의 데이터센터 간 삼중화를 위해 별도 전용망을 구성하겠다고 발표(2022-12). 카카오톡 메시지 송수신은 전 국민 규모 트래픽.
+      risk: 센터 간 전환(failover)이 네트워크·전환 시스템에 달려 있음. 판교 화재 때는 전환을 돕는 일부 시스템이 같이 멈춰 다른 센터로 넘어가지 못한 것이 근본 원인이라고 카카오가 설명. 대규모 DDoS도 상시 위협.
+      study: 데이터센터 간 전용망, GSLB·DNS 기반 전환, L4/L7 로드밸런서, 메시지 전송 프로토콜.
+      sources:
+        - title: 카카오 재발 방지 대책(인프라)
+          url: https://www.kakaocorp.com/page/detail/9901
+    "3":
+      level: lo
+      here: 판교 센터에만 서버 약 3만2천 대가 있었고 화재로 전부 다운됐다고 카카오 부사장이 설명(2022-10). 서버 OS 구성은 공개 자료가 적음. 단말 쪽으로는 카카오톡 모바일·PC 앱을 직접 배포.
+      risk: 대량 서버를 한꺼번에 다시 올릴 때 설치 환경 정보와 자동화 도구가 없으면 복구가 늦어짐. PC 메신저 클라이언트는 사용자 단말에 깔리는 코드라 업데이트 경로가 공격 표면.
+      study: 대규모 서버 재기동(cold start) 절차, Linux 서버 하드닝, 데스크톱 앱 자동 업데이트 보안.
+      sources:
+        - title: "카카오 부사장: 3.2만대 서버 전체 다운"
+          url: https://mobile.newsis.com/view/NISX20221016_0002049472
+    "4":
+      level: mid
+      here: CNCF 사례에 따르면 카카오는 OpenStack 위 온프레미스 쿠버네티스로 클러스터 7천 개 이상, 노드 12만 대 이상을 운영하고, 네트워크를 eBPF 기반 Cilium(kube-proxy 대체 모드)으로 바꿈. 카카오엔터프라이즈는 Cluster API로 사내 쿠버네티스를 서비스로 제공하는 사례를 if(kakao)dev 2022에서 발표.
+      risk: 클러스터 수가 많을수록 버전·권한 설정이 흩어지기 쉬움. 컨테이너 탈출이나 과한 RBAC 권한은 같은 노드·클러스터의 다른 서비스로 번짐.
+      study: 쿠버네티스 RBAC·네트워크 정책, Cilium·eBPF 구조, Cluster API, 컨테이너 탈출 N-day.
+      sources:
+        - title: CNCF 사례 연구(Kakao)
+          url: https://www.cncf.io/case-studies/kakao/
+        - title: 카카오엔터프라이즈 기술블로그(if kakao 2022 쿠버네티스 세션)
+          url: https://tech-kakaoenterprise.tistory.com/178
+    "5":
+      level: mid
+      here: 안산 센터는 6EB 저장 규모로 발표. 판교 화재 때는 서버 이전·재설치에 필요한 환경 정보가 판교 안에 있어 조회에 한계가 있었다고 카카오가 밝힘(2022-12).
+      risk: 데이터는 복제돼 있어도 복구에 필요한 설정·메타데이터·백업이 같은 장소에 있으면 소용이 없음. 사진·파일 같은 대용량 저장소는 권한 설정 실수 시 대량 노출.
+      study: 백업 3-2-1 원칙, 설정·메타데이터 백업, 오브젝트 스토리지 권한 모델.
+      sources:
+        - title: if(kakao) 2022 재발 방지 발표 보도
+          url: https://biz.newdaily.co.kr/site/data/html/2022/12/07/2022120700110.html
+        - title: 카카오 데이터센터 안산 준공
+          url: https://www.kakaocorp.com/page/detail/10638
+    "6":
+      level: hi
+      here: 카카오는 일반채팅과 오픈채팅에 같은 회원일련번호를 쓰고, 오픈채팅에서는 오픈채팅방 ID와 회원일련번호를 합친 임시 ID를 메시지 송수신에 썼음. 2020-08 이전 방은 임시 ID를 암호화하지 않았다고 개인정보위가 발표.
+      risk: 내부 식별자를 그대로 노출하면 다른 기능에서 얻은 정보와 결합돼 익명성이 깨짐(2023 오픈채팅 사건). 카카오는 임시 ID만으로는 개인 식별이 안 된다고 반박했지만 1심 법원은 결합된 DB 판매를 유출로 봄(보도 기준).
+      study: 식별자 설계(가명화·토큰화), 데이터 결합 위험, 개인정보 판단 기준(결합 용이성).
+      sources:
+        - title: 개인정보위 과징금 151억 보도
+          url: https://m.boannews.com/html/detail.html?idx=130023
+        - title: "개인정보위: 회원번호로 식별 불가 주장 수긍 어려워"
+          url: https://m.etnews.com/20240605000246
+    "7":
+      level: hi
+      here: 카카오계정 하나로 카카오톡과 외부 사이트(카카오 로그인, OAuth)에 로그인. 2024-11 카카오계정에 웹 기반 패스키 로그인을 도입해 카카오 로그인을 쓰는 외부 서비스에서도 쓸 수 있게 함.
+      risk: 계정 하나에 메신저·결제·모빌리티가 엮여 있어 계정 탈취 피해가 큼. 판교 화재 때 카카오T·카카오맵 등 카카오 계정과 연계된 서비스도 접속이 안 됐다는 보도처럼 인증 장애도 전 서비스로 번짐(보도 기준).
+      study: OAuth 2.0·OIDC 흐름, 패스키(FIDO2) 원리, 계정 복구 절차의 보안.
+      sources:
+        - title: 카카오계정 패스키 도입
+          url: https://www.kakaocorp.com/page/detail/11349
+        - title: Kakao Developers 보안 관련 약관
+          url: https://developers.kakao.com/terms/latest/ko/security
+    "8":
+      level: hi
+      here: 업무 메신저 카카오워크를 외부 기업에 판매. 2026-11-01 운영 자회사 디케이테크인에서 카카오로 서비스 주체가 바뀌었고, 실제 운영은 디케이테크인이 맡고 있다는 보도.
+      risk: 2026-11-09 카카오워크 시스템에 외부 공격자의 비정상 접근이 확인됨. 이름·부서·전화번호·이메일, 메일 본문·첨부파일, 암호화 메시지까지 유출 항목에 포함됐다는 보도. 피해 규모는 고객사 44곳 약 5천 명이라는 보도와 미공개라는 보도가 엇갈림(보도 기준, 조사 중).
+      study: 협업 SaaS의 테넌트 분리, 서비스 이관 시 권한·계정 정리, 종단간 암호화의 한계(키 관리).
+      sources:
+        - title: 카카오워크 해킹 보도(보안뉴스)
+          url: https://www.boannews.com/news/articleView.html?idxno=147242
+        - title: 카카오 기업용 메신저 유출(시사저널)
+          url: https://www.sisajournal.com/news/articleView.html?idxno=393928
+    "9":
+      level: mid
+      here: 카카오엔터프라이즈가 카카오클라우드를 운영하며 관리형 쿠버네티스(Kubernetes Engine)를 제공. 2021년 공공용 카카오 i 클라우드로 CSAP(IaaS) 인증, 2025-09 하이브리드 GPUaaS 출시. 계열사 카카오모빌리티는 온프레미스에 구글 클라우드 GKE를 더한 멀티 클라우드 이중화 구성을 공개.
+      risk: 클라우드 사업자로서 IAM·테넌트 경계, 공공 클라우드 요건이 붙음. 멀티 클라우드는 장애에 강하지만 계정·비밀값 관리 지점이 늘어남.
+      study: 카카오클라우드 Kubernetes Engine 실습, 멀티 클라우드 IAM, CSAP 요건 읽기.
+      sources:
+        - title: 공공기관용 카카오 i 클라우드 출시
+          url: https://www.kakaocorp.com/page/detail/9504
+        - title: 카카오클라우드 Kubernetes Engine 튜토리얼
+          url: https://docs.kakaocloud.com/en/tutorial/container/k8s-engine-k8s-cluster
+        - title: 카카오모빌리티 GKE 사례
+          url: https://cloud.google.com/customers/kakaomobility?hl=ko
+    "10":
+      level: hi
+      here: 2024-05 카카오톡 장애 3건의 원인은 서버 파일 업데이트 중 기존 파일 삭제, 다른 서버에 작업 잘못 반영, 오류 미해결 상태에서 다른 서버 업데이트였다고 보도됨. 과기정통부는 사전테스트, 작업관리 통제, 매뉴얼 구체화를 3개월 안에 시정하라고 요구.
+      risk: 배포·변경 작업 실수가 곧 전국 장애. 승인·통제 없는 운영 작업은 내부자 실수와 공격 모두에 취약.
+      study: 변경관리(승인·카나리 배포·롤백), 배포 자동화의 권한 분리, 장애 회고(postmortem) 쓰는 법.
+      sources:
+        - title: 과기정통부 카카오 시정 요구(SBS Biz)
+          url: https://biz.sbs.co.kr/amp/article/20000174270
+        - title: 카카오톡 장애 시정조치 보도(보안뉴스)
+          url: https://m.boannews.com/html/detail.html?idx=130270
+    "11":
+      level: hi
+      here: 판교 화재 때 모니터링·분석 도구와 운영 관리 도구가 판교 안에서만 이중화돼 있어 함께 멈췄고, 장애 탐지와 복구가 늦어졌다고 카카오가 인정. 정부는 운영·관리 도구까지 데이터센터 간 다중화하라고 요구. 2024년 장애 뒤에는 통합모니터링 시스템을 구축했다고 밝힘(보도 기준).
+      risk: 관측·운영 도구가 서비스와 같은 장애 영역에 있으면 장애 때 눈과 손이 같이 사라짐. 운영 도구는 전 서버 권한을 가져 침해 시 피해도 큼.
+      study: 관측 시스템 분리 배치, 장애 대응 런북, 운영 도구 권한 관리.
+      sources:
+        - title: 우리의 재발 방지 계획(카카오)
+          url: https://www.kakaocorp.com/page/detail/9900
+        - title: 작업 도구 이중화 누락 보도
+          url: https://mobile.newsis.com/view/NISX20221019_0002054009
+    "12":
+      level: mid
+      here: 자체 버그바운티를 운영함(개인정보 처리방침에 「카카오 버그바운티」 서비스가 명시되고 포상금 지급용 정보 수집 항목이 2026-07 개정됨). 포상금 범위와 연간 실적은 공식 자료로 확인하지 못함. 카카오모빌리티는 2025-08 KISA 신규 취약점 신고포상제 공동 운영사로 참여. 정보보호 투자는 늘었지만 IT 투자 대비 비중은 공시 기업 평균보다 낮다는 보도.
+      risk: 2024년 해외 거주 제보자가 국내 계좌가 없어 포상을 못 받았다는 주장이 커뮤니티에 있음(공식 확인 안 됨). 계열사·자회사마다 신고 창구와 범위가 다를 수 있음.
+      study: 버그바운티 정책 문서 읽기, 정보보호 공시 읽는 법, 계열사별 신고 창구 구분.
+      sources:
+        - title: 카카오 개인정보 처리방침 개정 공지(버그바운티 항목)
+          url: https://kakaocorp.com/policy/notice/kakaocorp/view?seq=2825
+        - title: 카카오모빌리티 KISA 신고포상제 참여
+          url: https://m.boannews.com/html/detail.html?idx=138579
+        - title: 네카오 보안 투자 비교 보도
+          url: https://newstomato.com/ReadNews.aspx?no=1305704
+    "13":
+      level: mid
+      here: 카카오모빌리티가 카카오T·카카오내비로 위치·이동 데이터를 다루고 자율주행 택시 호출 서비스를 운영. 2023-02 개인정보위는 자율주행 택시 이용 시 개인정보 제공에 동의하지 않으면 호출을 못 하게 한 점에 과태료 600만 원과 시정명령을 의결.
+      risk: 위치 정보와 차량 연동 서비스는 일반 웹과 다른 공격 표면. 이동 경로는 민감한 개인정보라 과다 수집·제3자 제공이 문제됨.
+      study: 위치정보법 기본, 커넥티드카·자율주행 원격 제어 보안, 위치 데이터 비식별화.
+      sources:
+        - title: 개인정보위 카카오모빌리티 과태료
+          url: https://byline.network/2023/02/8_09876/
+    "14":
+      level: hi
+      here: 카카오톡, 오픈채팅, 카카오페이, 카카오T, 카카오맵 등. 같은 회원 체계 위에 메신저·결제·모빌리티가 얹힌 구조.
+      risk: 오픈채팅 취약점으로 임시 ID를 모아 다른 정보와 결합한 사건(2023, 과징금 151억 원). 계열사 카카오페이는 애플 결제 관련 업무 중 이용자 약 4,045만 명 정보를 동의 없이 알리페이에 넘겨 2025-01 과징금 59억6,800만 원, 2026-06 1심 패소(보도 기준).
+      study: 익명 기능의 식별자 노출, 결제 흐름 위변조, 다중 역할 서비스의 권한 분리(IDOR).
+      sources:
+        - title: 오픈채팅 과징금 보도(MTN)
+          url: https://news.mtn.co.kr/news-detail/2024052312543066960
+        - title: 카카오페이·애플 과징금
+          url: https://newstomato.com/ReadNews.aspx?no=1251803
+        - title: 카카오페이 소송 1심 결과
+          url: https://www.news1.kr/amp/society/court-prosecution/6194672
+    "15":
+      level: hi
+      here: 판교 화재 당시 핵심 서버를 외부 사업자(SK C&C)의 데이터센터에 두고 있었음. 카카오페이는 결제 협력사(알리페이)로 이용자 정보를 넘긴 일이 제재를 받았고, 카카오워크는 자회사 운영 체계에서 사고가 남.
+      risk: 임차 데이터센터의 전력·소방 설계, 협력사로 넘어가는 데이터, 자회사 운영 서비스가 모두 회사 밖 경계. 사고가 나면 책임 소재가 쟁점이 됨.
+      study: 데이터센터 임차 계약의 SLA·감사 항목, 개인정보 처리위탁과 제3자 제공 구분, 협력사 보안 평가.
+      sources:
+        - title: 정부 조사 결과(SK C&C 판교)
+          url: https://www.etnews.com/20221206000169
+        - title: 카카오페이 알리페이 경유 문제 해설
+          url: https://www.dailian.co.kr/news/view/1659507
+    "16":
+      level: mid
+      here: 자체 언어모델 Kanana를 허깅페이스에 오픈소스로 공개(2025~2026, Kanana-2 포함)하고, 가드레일 모델 Kanana Safeguard 3종을 Apache 2.0으로 공개(2025-05). 2025-10 OpenAI와 「ChatGPT for Kakao」를 카카오톡에 출시. 정부 GPU 확보 사업으로 B200 GPU 2,424장 구축.
+      risk: 채팅방에서 AI 답변을 공유하는 구조는 대화 속 개인정보와 프롬프트 인젝션 위험을 키움. 외부 AI 사업자와의 계정 연동·데이터 흐름도 확인 대상.
+      study: LLM 앱 위협 모델(MITRE ATLAS), 가드레일 모델 직접 돌려 보기, AI 에이전트 권한 설계.
+      sources:
+        - title: Kanana 언어모델 오픈소스 공개
+          url: https://www.kakaocorp.com/page/detail/11566
+        - title: Kanana Safeguard 공개
+          url: https://www.kakaocorp.com/page/detail/11568
+        - title: ChatGPT for Kakao 출시
+          url: https://www.kakaocorp.com/page/detail/11780
+        - title: 정부 GPU 확보 사업 인프라 구축
+          url: https://www.kakaocorp.com/page/detail/11861
+  paths:
+    - title: 2022 판교 데이터센터 화재
+      steps:
+        - { area: "1", label: 배터리실 발화로 UPS까지 정지 }
+        - { area: "3", label: 판교 서버 약 3만2천 대 다운 }
+        - { area: "11", label: 판교에만 있던 모니터링·운영 도구 동반 마비 }
+        - { area: "7", label: 카카오 계정 연계 서비스로 장애 확산 }
+        - { area: "14", label: 카카오톡·T·맵 등 장기 장애 }
+      source: https://www.kakaocorp.com/page/detail/9900
+    - title: 2023 오픈채팅 이용자 정보 결합·판매
+      steps:
+        - { area: "14", label: 오픈채팅방 취약점으로 참여자 임시 ID 수집 }
+        - { area: "6", label: 암호화 안 된 임시 ID에서 회원일련번호 추출 }
+        - { area: "7", label: 회원일련번호로 일반채팅 정보와 결합 }
+        - { area: "12", label: 개인정보 파일을 텔레그램 등에서 판매, 과징금 151억 원 }
+      source: https://m.boannews.com/html/detail.html?idx=130023
+    - title: 2026 카카오워크 해킹
+      steps:
+        - { area: "15", label: 자회사 운영 서비스를 카카오로 이관한 직후 }
+        - { area: "8", label: 업무 메신저 시스템에 외부 비정상 접근 }
+        - { area: "5", label: 메일 본문·첨부파일 원본까지 유출(보도 기준) }
+        - { area: "7", label: 비밀번호 변경 권고, 사칭·피싱 2차 피해 주의 }
+      source: https://www.boannews.com/news/articleView.html?idxno=147242
+  timeline:
+    - date: "2022-10"
+      text: SK C&C 판교 데이터센터 화재로 카카오톡 등 주요 서비스 장기 장애(최대 약 127시간, 보도 기준)
+      bad: true
+    - date: "2022-12"
+      text: "정부 조사 결과 발표(운영·관리 도구 다중화 등 행정지도). 카카오는 if(kakao) 2022에서 원인 분석과 재발 방지 대책 공개"
+    - date: "2023-03"
+      text: 오픈채팅 참여자 정보를 결합한 개인정보 파일이 판매된다는 보도
+      bad: true
+    - date: "2023-09"
+      text: 첫 자체 데이터센터 「카카오 데이터센터 안산」 준공(2024-01 가동)
+    - date: "2024-05"
+      text: 카카오톡 장애 3건, 과기정통부가 사전테스트·작업관리 통제 시정 요구
+      bad: true
+    - date: "2024-05"
+      text: 개인정보위, 오픈채팅 유출로 과징금 151억4,196만 원·과태료 780만 원 부과
+      bad: true
+    - date: "2024-11"
+      text: 카카오계정에 웹 기반 패스키 로그인 도입
+    - date: "2025-01"
+      text: 개인정보위, 알리페이 정보 이전 건으로 카카오페이에 과징금 59억6,800만 원 부과
+      bad: true
+    - date: "2025-06"
+      text: 남양주 제2데이터센터(AI 디지털 허브) 계획 발표, 2029 준공 목표
+    - date: "2025-10"
+      text: 카카오톡에 「ChatGPT for Kakao」 출시
+    - date: "2026-01"
+      text: 오픈채팅 과징금 취소 소송 1심에서 카카오 패소, 카카오 항소(보도 기준)
+      bad: true
+    - date: "2026-11"
+      text: 카카오워크 시스템에 외부 공격자 비정상 접근, 메일·첨부파일 등 유출(보도 기준, 조사 중)
+      bad: true
+  use:
+    - title: 버그바운티로 볼 만한 곳 (범위·규칙 확인이 먼저)
+      style: ul
+      items:
+        - "<b>카카오계정·카카오 로그인(7·14):</b> 외부 사이트가 카카오 로그인을 붙이는 OAuth 흐름과 패스키 등록·복구 흐름. 연동한 서비스 쪽 결함이면 신고처가 다름."
+        - "<b>오픈채팅(14·6):</b> 익명 기능에서 내부 식별자가 노출되거나 다른 기능 정보와 결합되는지. 2023 사건의 교훈을 기준으로 설계 관점에서 본다."
+        - "<b>카카오페이(14·15):</b> 결제 금액·주문 상태 같은 비즈니스 로직과 제3자 제공 흐름. 계열사라 신고 창구와 범위를 따로 확인."
+        - "<b>카카오T(14·13):</b> 승객·기사·운영자 역할 간 권한 분리와 위치 정보 노출. 카카오모빌리티는 KISA 신고포상제 공동 운영사."
+        - "<b>ChatGPT for Kakao·카나나(16):</b> 채팅방 대화가 AI 입력으로 들어갈 때의 프롬프트 인젝션과 정보 노출."
+        - "<b>카카오클라우드 콘솔(9·4):</b> IAM과 쿠버네티스 엔진의 테넌트 경계. 테스트는 자기 계정 안에서만."
+      note: 실제 이용자 데이터에 접근하거나 서비스를 방해하는 테스트는 하지 않습니다. 범위 밖 자산(계열사 포함)은 각 프로그램 규칙을 확인하기 전에는 건드리지 않습니다.
+    - title: 이 해부로 공부하는 순서
+      style: ol
+      items:
+        - "<b>1 → 11:</b> 판교 화재 공식 원인 분석과 정부 조사 결과를 읽고, 단일 센터 집중과 운영 도구 이중화 누락을 정리한다."
+        - "<b>14 → 6 → 7:</b> 오픈채팅 사건을 개인정보위 발표와 1심 판결 보도로 다시 읽고 식별자 설계를 정리한다."
+        - "<b>10 → 11:</b> 2024-05 장애 3건을 변경관리 관점에서 보고 사전테스트·작업 통제가 왜 필요한지 쓴다."
+        - "<b>4 → 9:</b> CNCF 카카오 사례로 대규모 쿠버네티스·Cilium 구조를 보고, 카카오클라우드 Kubernetes Engine을 직접 만져 본다."
+        - "<b>8 → 15:</b> 카카오워크 사건과 카카오페이 알리페이 건으로 자회사·협력사 경계를 정리한다."
+        - "<b>16:</b> Kanana Safeguard를 내려받아 가드레일이 무엇을 막는지 실험한다."
+      note: 영역마다 블로그 글 한 편으로 마무리하면 「카카오 인프라 해부」 시리즈가 됩니다.
