@@ -1,0 +1,10 @@
+title: 2025 Langflow KEV 등재
+date: "2025"
+summary: AI 워크플로 도구 취약점이 실제 악용됨
+areas:
+  - "16"
+recent: false
+status: reported
+sources: []
+vulns:
+  - CVE-2025-3248

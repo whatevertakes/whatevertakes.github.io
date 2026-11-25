@@ -1,0 +1,33 @@
+name: 쿠팡
+region: kr
+order: 3
+tag: 이커머스·배달·OTT
+services:
+  - name: 로켓배송·쿠팡 앱
+    areas:
+      - "14"
+      - "7"
+  - name: 쿠팡이츠
+    areas:
+      - "14"
+  - name: 쿠팡플레이
+    areas:
+      - "14"
+      - "2"
+  - name: 쿠페이
+    areas:
+      - "14"
+      - "7"
+infra: 클라우드 기반 대규모 MSA로 알려짐(엔지니어링 블로그).
+incidents:
+  - date: 2025~2026
+    text: 개인정보 약 3,367만 건 유출(민관합동조사단, 2026-02). 퇴사한 인증 시스템 개발자가 갱신·폐기되지 않은 토큰 서명키로 접근. 배송지 목록 약 1.4억 회 조회. 개인정보위 과징금 약 6,247억 원 보도
+    areas:
+      - "7"
+      - "14"
+    source: https://www.newsis.com/view/NISX20260210_0003510149
+bounty:
+  status: unknown
+  note: 공개 버그바운티 운영 여부 확인 못 함
+tip: 서명키·비밀값의 수명 관리(발급·회전·폐기)가 무너지면 내부자 한 명이 전체 계정을 연다. 아이덴티티(7)와 시크릿 관리(10) 실무 사례.
+blog: https://medium.com/coupang-engineering

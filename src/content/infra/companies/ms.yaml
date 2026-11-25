@@ -1,0 +1,41 @@
+name: Microsoft
+region: global
+order: 16
+tag: OS·업무 SaaS·클라우드
+services:
+  - name: Windows·Active Directory
+    areas:
+      - "3"
+      - "7"
+  - name: Microsoft 365·Exchange·SharePoint
+    areas:
+      - "8"
+  - name: Azure·Entra ID
+    areas:
+      - "9"
+      - "7"
+  - name: GitHub
+    areas:
+      - "10"
+      - "15"
+infra: 국내 기업 사내망(AD, M365)의 사실상 표준.
+incidents:
+  - date: "2023"
+    text: "Storm-0558: 소비자용 서명키로 기업 메일 토큰 위조"
+    areas:
+      - "7"
+  - date: "2024"
+    text: "Midnight Blizzard: MFA 없는 레거시 테스트 테넌트에 비밀번호 스프레이 → OAuth 앱 악용 → 임원 메일 접근"
+    areas:
+      - "7"
+      - "9"
+  - date: "2026"
+    text: SharePoint 역직렬화 등 다수가 CISA KEV 등재(랜섬웨어 사용 포함)
+    areas:
+      - "8"
+bounty:
+  status: yes
+  note: MSRC 바운티(클라우드·Windows·M365 등)
+  url: https://www.microsoft.com/en-us/msrc/bounty
+tip: 레드팀 면접의 단골 영역(AD·Entra). 잊힌 테스트 계정·테넌트가 입구가 된다는 점이 실무 포인트.
+blog: https://www.microsoft.com/en-us/security/blog/

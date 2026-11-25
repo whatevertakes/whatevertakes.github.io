@@ -1,0 +1,11 @@
+title: 2026 npm 신뢰 계정 악용 (TanStack, Nx Console)
+date: "2026"
+summary: 정상 패키지·확장의 악성 버전이 공식 레지스트리로 배포 (KEV, 랜섬웨어 사용 확인)
+areas:
+  - "15"
+recent: true
+status: reported
+sources: []
+vulns:
+  - CVE-2026-45321
+  - CVE-2026-48027

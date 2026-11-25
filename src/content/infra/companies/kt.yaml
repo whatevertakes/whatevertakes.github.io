@@ -1,0 +1,30 @@
+name: KT
+region: kr
+order: 8
+tag: 통신·인터넷
+services:
+  - name: 유·무선 인터넷 백본
+    areas:
+      - "2"
+  - name: 이동통신
+    areas:
+      - "13"
+  - name: KT 클라우드(공공)
+    areas:
+      - "9"
+      - "1"
+infra: 국가 기간 통신망. 백본 라우팅과 기지국 인증이 핵심.
+incidents:
+  - date: "2021"
+    text: 라우팅 설정 오류로 전국 유·무선 인터넷 장애
+    areas:
+      - "2"
+  - date: "2025"
+    text: 불법 초소형 기지국(펨토셀)을 이용한 무단 소액결제 사건
+    areas:
+      - "13"
+      - "7"
+bounty:
+  status: unknown
+  note: 공개 버그바운티 확인 못 함
+tip: 설정 실수 하나가 전국 장애가 되는 네트워크(2), 기지국 인증이라는 특수 인프라(13) 사례.

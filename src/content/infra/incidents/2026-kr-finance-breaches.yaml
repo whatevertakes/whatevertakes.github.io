@@ -1,0 +1,13 @@
+title: 2026 금융권 연쇄 해킹 (9~11월)
+date: "2026"
+summary: 외부 접근 가능한 업무용 시스템의 인증·접근통제 공백. 당국이 금융권 인증·접근통제 재점검 지시
+areas:
+  - "7"
+  - "14"
+notes:
+  "14": 은행·저축은행·캐피탈 다수 피해. 고객용이 아닌 직원용·대출모집인용 외부 웹페이지의 약한 인증이 경로로 지목. 다중인증 적용사는 피해 없음. AI 활용 정황 보도
+recent: true
+status: reported
+sources:
+  - https://news.mtn.co.kr/news-detail/2026100320522390696
+  - https://www.mt.co.kr/article/2026100416035928940

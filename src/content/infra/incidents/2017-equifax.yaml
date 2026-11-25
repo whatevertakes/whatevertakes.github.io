@@ -1,0 +1,10 @@
+title: 2017 Equifax 유출
+date: "2017"
+summary: Struts 패치 지연 → 대규모 개인정보 유출
+areas:
+  - "14"
+recent: false
+status: reported
+sources: []
+vulns:
+  - CVE-2017-5638

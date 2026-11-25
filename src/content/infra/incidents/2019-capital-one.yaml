@@ -1,0 +1,8 @@
+title: 2019 Capital One 유출
+date: "2019"
+summary: SSRF → 인스턴스 메타데이터 → IAM 자격증명 → S3 대량 유출
+areas:
+  - "9"
+recent: false
+status: reported
+sources: []

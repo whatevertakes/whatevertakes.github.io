@@ -1,0 +1,303 @@
+name: 네이버
+region: kr
+order: 1
+tag: 포털·커머스·클라우드
+services:
+  - name: 검색·블로그·카페
+    areas:
+      - "14"
+      - "6"
+  - name: 네이버페이·스마트스토어
+    areas:
+      - "14"
+      - "7"
+  - name: 네이버웹툰
+    areas:
+      - "14"
+      - "9"
+  - name: 네이버클라우드(NCP), 공공 클라우드
+    areas:
+      - "9"
+      - "4"
+      - "1"
+  - name: HyperCLOVA X
+    areas:
+      - "16"
+infra: 자체 데이터센터(각 춘천·각 세종)와 자체 퍼블릭 클라우드(NCP) 보유. 서비스는 Java/Spring 비중이 큼(D2 기술블로그). 공공 클라우드 사업자이기도 해서 CSAP 요건이 인프라에 반영됨.
+incidents:
+  - date: "2023"
+    text: LINE 정보 유출 경로로 네이버클라우드 협력사·공유 인증 체계가 지목됨 (LY 항목 참고)
+    areas:
+      - "7"
+      - "8"
+bounty:
+  status: yes
+  note: 자체 버그바운티 운영(2015 KISA 공동 → 독립). 2018년 국내 기업 최초 CVE 발급 기관(CNA) 등록
+  url: https://www.navercorp.com/media/pressReleasesDetail?seq=30012
+tip: 서비스 범위가 넓어 웹·API(14), 인증(7), 클라우드(9)를 함께 봐야 함. CNA라 네이버 제품 취약점은 네이버가 직접 CVE를 발급.
+blog: https://d2.naver.com/
+deep:
+  summary: 네이버의 서비스가 어떤 인프라 위에 있고, 각 영역에서 무엇이 위험하며, 실제로 어떤 사건이 있었는지를 공개 자료로 정리했습니다. 네이버 내부 구조를 확인한 것은 아니며 일부는 공개 자료에서 추정했습니다.
+  facts:
+    - label: 물리
+      value: 자체 데이터센터 2곳
+      detail: 각 춘천(2013), 각 세종(2023 가동, AI 클러스터). 기가와트급 AI 팩토리 계획 발표(2026-06)
+    - label: 클라우드
+      value: 자체 퍼블릭 클라우드 NCP
+      detail: 민간·공공·금융용 클라우드와 GPU 임대(GPUaaS)를 직접 판매
+    - label: 신고 채널
+      value: 버그바운티 + CNA
+      detail: 2015년 KISA 공동 운영 후 독립. 2018년 국내 기업 최초 CVE 발급 기관
+    - label: 대표 사건
+      value: 2023 LINE 정보 유출
+      detail: 네이버클라우드 협력사 PC 감염 → 공유 인증 체계 → LINE 내부 시스템
+  services:
+    - name: 검색·AI 답변
+      areas:
+        "1": related
+        "2": core
+        "3": related
+        "4": related
+        "6": core
+        "11": core
+        "14": core
+        "15": related
+        "16": core
+    - name: 블로그·카페
+      areas:
+        "2": related
+        "5": core
+        "6": core
+        "7": related
+        "12": related
+        "14": core
+    - name: 스마트스토어·쇼핑
+      areas:
+        "5": related
+        "6": core
+        "7": core
+        "10": related
+        "11": related
+        "14": core
+    - name: 네이버페이
+      areas:
+        "6": core
+        "7": core
+        "9": related
+        "12": core
+        "14": core
+    - name: 네이버 로그인·인증서
+      areas:
+        "7": core
+        "12": core
+        "14": core
+    - name: 네이버웹툰
+      areas:
+        "2": core
+        "5": core
+        "9": related
+        "14": related
+    - name: 치지직(라이브)
+      areas:
+        "2": core
+        "4": related
+        "11": related
+        "14": related
+    - name: 웨일 브라우저
+      areas:
+        "3": core
+        "14": related
+        "15": core
+    - name: MYBOX
+      areas:
+        "5": core
+        "7": related
+        "9": related
+    - name: NAVER WORKS
+      areas:
+        "5": related
+        "7": core
+        "8": core
+        "9": related
+    - name: 네이버클라우드(NCP)
+      areas:
+        "1": core
+        "4": core
+        "5": core
+        "7": core
+        "9": core
+        "10": related
+        "11": related
+        "12": related
+    - name: HyperCLOVA X
+      areas:
+        "1": core
+        "4": related
+        "9": related
+        "13": core
+        "16": core
+    - name: 1784 로봇
+      areas:
+        "2": core
+        "4": related
+        "9": related
+        "13": core
+  areas:
+    "1":
+      here: 자체 데이터센터 각 춘천(2013)과 각 세종(2023 가동). 각 세종은 GPU를 매년 수만 장씩 늘리는 AI 클러스터로 소개됨. 2026-06 엔비디아와 각 세종 약 4배 규모 AI 팩토리 계획 발표(전력 확보 조건).
+      risk: 화재·전원 같은 물리 사고가 곧 전 서비스 장애. 카카오 판교 화재(2022), 국가정보자원관리원 화재(2025) 이후 대형 플랫폼의 이중화·재난관리 책임이 커짐. BMC 같은 서버 관리망은 별도 보호 대상.
+      study: 데이터센터 이중화(Active-Active), UPS·배터리 배치, 대형 사업자 재난관리 규제.
+      sources:
+        - title: 각 세종 AI 팩토리 발표
+          url: https://www.newsis.com/view/NISX20260608_0003659640
+        - title: 각 세종 오픈
+          url: https://byline.network/2023/11/1108-3/
+    "2":
+      here: 국내 최대급 웹 트래픽에 웹툰(글로벌), 치지직 라이브 스트리밍까지. 사옥 1784에는 이음5G(5G 특화망)를 국내 처음 상용화.
+      risk: 대규모 DDoS, 프록시·CDN 계층의 요청 처리 결함, 스트리밍 트래픽 급증. 2026년 nginx HTTP/2·HTTP/3 취약점(nginx2root)처럼 웹 서버 계층 결함은 전 서비스에 바로 영향.
+      study: CDN 구조, L4/L7 로드밸런서, HTTP/2·HTTP/3, 라이브 스트리밍 프로토콜.
+      sources:
+        - title: 삼성전자-네이버클라우드 이음5G
+          url: https://byline.network/2022/06/2-129/
+    "3":
+      here: 서버는 대량의 Linux. 단말 쪽으로는 네이버 앱과 Chromium 기반 웨일 브라우저를 직접 배포.
+      risk: 웨일은 Chromium 상위 패치를 따라가야 한다. 2026년 KEV에는 Chromium V8 등 실제 악용 취약점이 여러 건 올라 있어 패치 반영 속도가 곧 사용자 위험.
+      study: Chromium 파생 브라우저의 패치 주기, Linux 서버 하드닝.
+      sources: []
+    "4":
+      here: NCP는 Kubernetes 관리형 서비스(NKS)를 판매. 사내 서비스도 컨테이너 플랫폼 이전 사례가 기술블로그에 공개.
+      risk: 클라우드 사업자는 여러 고객이 같은 하드웨어를 쓰는 멀티 테넌트. 컨테이너·하이퍼바이저 격리가 깨지면 고객 간 경계가 무너짐.
+      study: Kubernetes RBAC, 멀티 테넌트 격리, 컨테이너 탈출 N-day(runc 등).
+      sources: []
+    "5":
+      here: MYBOX(개인 클라우드 저장소), 블로그·카페·웹툰의 대용량 이미지, NCP Object Storage(S3 호환).
+      risk: 공개 링크·버킷 권한 설정 실수, 백업 분리. 개인 파일 저장소는 계정 탈취 시 피해가 큼.
+      study: S3 호환 스토리지 권한 모델, 서명 URL, 백업 분리.
+      sources: []
+    "6":
+      here: Java/Spring 중심. 네이버가 만든 오픈소스로 ARCUS(memcached 기반 캐시 클러스터), nBase-ARC(Redis 기반 클러스터)가 공개돼 있고, CUBRID는 NHN 시절 개발된 DB.
+      risk: 캐시·DB 관리 포트 노출, 역직렬화, 프레임워크 N-day(Spring4Shell, Log4Shell 등)가 Java 생태계 공통 위험.
+      study: ARCUS·nBase-ARC를 직접 설치해 보기, Spring 보안 N-day 해부.
+      sources:
+        - title: ARCUS (GitHub)
+          url: https://github.com/naver/arcus
+        - title: nBase-ARC (GitHub)
+          url: https://github.com/naver/nbase-arc
+    "7":
+      here: 네이버 로그인(외부 사이트용 OAuth), 네이버 인증서(민간 전자서명), 2단계 인증. 사내 쪽은 LINE과 인증 체계를 공유했던 것이 2023년 사건의 핵심.
+      risk: OAuth 연동 결함, 계정 탈취, 공유 인증 체계(AD)를 통한 회사 간 확산. 일본 총무성은 공유 AD 중단과 독자 인증 구축을 요구한 것으로 보도됨.
+      study: OAuth 2.0·OIDC 흐름, 민간 인증서 구조, AD 신뢰 관계.
+      sources:
+        - title: LY 공지(최종 업데이트)
+          url: https://www.lycorp.co.jp/en/news/announcements/007715/
+        - title: Dark Reading 분석
+          url: https://darkreading.com/cybersecurity-operations/japan-line-breach-clean-up-post-merger-tech-sprawl
+    "8":
+      here: 협업 SaaS NAVER WORKS를 외부에 판매. 사내 인사 시스템 등을 LINE과 공유했던 이력.
+      risk: 관계사·협력사와 공유한 사내 시스템이 경계를 무너뜨림(2023 LINE). 협업 SaaS는 고객사 데이터가 모이는 곳.
+      study: 계열사 간 IT 분리, 협력사 접근 관리, 협업 SaaS 권한 모델.
+      sources: []
+    "9":
+      here: 네이버클라우드가 민간·공공(CSAP)·금융 클라우드를 운영하고 GPU 임대까지 판매. 네이버 자신이 클라우드 고객이자 사업자.
+      risk: 클라우드 IAM·메타데이터·테넌트 경계. 공공 클라우드는 망분리·인증 요건이 붙어 일반 클라우드와 구조가 다름.
+      study: NCP 무료 체험으로 IAM(Sub Account), VPC, Object Storage 직접 구성. CSAP 요건 읽기.
+      sources: []
+    "10":
+      here: 대규모 사내 CI/CD. GitHub naver 조직에 다수 오픈소스를 공개.
+      risk: CI 비밀값, 빌드 러너 권한, 오픈소스 배포 계정 탈취(2026년 Trivy·npm 사례 참고).
+      study: CI 비밀값 관리, 배포 서명, 오픈소스 유지보수자 보안.
+      sources:
+        - title: github.com/naver
+          url: https://github.com/naver
+    "11":
+      here: 분산 추적 APM인 Pinpoint를 네이버가 만들어 오픈소스로 공개(현재 pinpoint-apm 조직).
+      risk: 모니터링 도구는 전 서버 구조와 접근 정보를 가진다. 관측 시스템 침해는 내부 지도 유출.
+      study: Pinpoint 설치로 분산 추적 구조 이해, 장애 대응 체계.
+      sources:
+        - title: Pinpoint (GitHub)
+          url: https://github.com/pinpoint-apm/pinpoint
+    "12":
+      here: 자체 버그바운티와 CNA 운영. 정보보호 공시상 투자액은 늘었지만(2026년 약 660억 원) 전체 IT 투자 대비 비율은 업계 평균보다 낮다는 지적.
+      risk: 보안 조직이 아무리 커도 관계사·협력사 경계(2023 LINE)에서 뚫릴 수 있음.
+      study: 버그바운티 정책 문서 읽기, CNA가 하는 일, 정보보호 공시 읽는 법.
+      sources:
+        - title: 네이버 버그바운티 독립 운영
+          url: https://www.navercorp.com/media/pressReleasesDetail?seq=30012
+        - title: 보안 투자 비교 보도
+          url: https://newstomato.com/ReadNews.aspx?no=1305704
+    "13":
+      here: "사옥 1784: 로봇의 판단을 클라우드가 대신하는 브레인리스 로봇을 이음5G 특화망으로 연결(2022). 각 세종 GPU 클러스터는 HPC 영역."
+      risk: 5G 특화망·로봇 제어 채널은 일반 IT와 다른 공격 표면. GPU 클러스터는 고가 자원이라 탈취·오남용 대상.
+      study: 5G 특화망 구조, 로봇 원격 제어 보안, GPU 클러스터 스케줄러.
+      sources:
+        - title: 1784 기술 소개
+          url: https://www.navercorp.com/tech/tech1784.html
+    "14":
+      here: 검색, 블로그·카페, 스마트스토어, 네이버페이, 웹툰, 지도, 예약, 치지직. 역할이 여러 개인 서비스가 많음.
+      risk: 권한 분리(IDOR), 결제 로직, 대량 조회. 2026-07 스마트스토어 판매자 정보가 다크웹에서 거래된다는 보도에 네이버는 해킹·유출을 부인(미확인).
+      study: 다중 역할 서비스의 권한 모델, 결제 흐름 위변조 점검.
+      sources:
+        - title: 스마트스토어 의혹 보도
+          url: https://inews24.com/view/wrlted/1923488
+    "15":
+      here: 협력사(외주) 직원 PC가 2023년 사건의 시작점. 오픈소스 제공자로서 Pinpoint·ARCUS 등을 배포하는 쪽이기도 함.
+      risk: 협력사·관계사 경유 침해, 의존 라이브러리 N-day, 배포 계정 탈취.
+      study: 협력사 보안 관리 기준, SBOM, 패키지 서명.
+      sources:
+        - title: LY 공지(경위)
+          url: https://www.lycorp.co.jp/en/news/announcements/001003/
+    "16":
+      here: HyperCLOVA X와 검색 속 AI 답변, GPU 임대. 엔비디아 Nemotron 기반 고도화 발표(2026).
+      risk: 검색 대상 웹 문서를 통한 간접 프롬프트 인젝션, AI 도구의 권한, 학습 데이터 개인정보. 2026년 KEV에는 LiteLLM·Langflow 등 AI 인프라 도구가 다수.
+      study: LLM 앱 위협 모델(MITRE ATLAS), 프롬프트 인젝션 사례 해부.
+      sources:
+        - title: MITRE ATLAS
+          url: https://atlas.mitre.org/
+  timeline:
+    - date: "2013"
+      text: 각 춘천 데이터센터 가동
+    - date: "2015"
+      text: 버그바운티를 KISA와 공동 운영 시작, 이후 독립 운영
+    - date: "2017"
+      text: 웨일 브라우저 출시(Chromium 기반), 네이버클라우드 플랫폼 상용화
+    - date: "2018"
+      text: 국내 기업 최초 CNA(CVE 발급 기관) 등록
+    - date: 2022-06
+      text: 사옥 1784에서 국내 첫 이음5G 상용화, 브레인리스 로봇 운영
+    - date: 2023-10
+      text: 네이버클라우드 협력사 PC 악성코드 감염 → 공유 인증 체계를 거쳐 LINE 내부 시스템 무단 접근. 이용자 약 30만 건 등 유출(LY 발표)
+      bad: true
+    - date: 2023-11
+      text: 각 세종 데이터센터 가동
+    - date: 2024-03
+      text: "일본 총무성 행정지도: 네이버 기술 의존과 공유 AD 문제 지적, 관리 체계 재검토 요구"
+      bad: true
+    - date: 2026-06
+      text: 엔비디아와 기가와트급 AI 팩토리 구축 계획 발표
+    - date: 2026-07
+      text: 스마트스토어 판매자 정보 다크웹 거래 보도, 네이버는 해킹·유출 부인(미확인)
+      bad: true
+    - date: 2026-09
+      text: 티빙 3,954만 계정 유출 보도. 네이버 제휴 가입자도 포함됐다는 보도(네이버 시스템 침해는 아님)
+      bad: true
+  use:
+    - title: 버그바운티로 볼 만한 곳 (범위·규칙 확인이 먼저)
+      style: ul
+      items:
+        - <b>네이버 로그인 연동(7·14):</b> 외부 사이트가 네이버 로그인을 붙일 때의 OAuth 흐름. 연동 결함은 연동한 서비스의 문제일 수 있으니 신고처를 구분.
+        - <b>스마트스토어(14·7):</b> 구매자·판매자·운영자 세 역할이 같은 데이터를 다른 권한으로 본다. 권한 분리(IDOR)가 핵심.
+        - <b>네이버페이 결제 흐름(14):</b> 금액·주문 상태·포인트 같은 비즈니스 로직.
+        - <b>웨일 브라우저(3·15):</b> Chromium 상위 패치가 얼마나 빨리 반영되는지.
+        - <b>AI 검색·HyperCLOVA X(16):</b> 검색 대상 문서에 숨은 지시문이 AI 답변에 섞이는 간접 프롬프트 인젝션.
+        - <b>NCP 콘솔·IAM(9):</b> 클라우드 사업자의 계정·권한 경계. 테스트는 자기 계정 안에서만.
+      note: 실제 이용자 데이터에 접근하거나 서비스를 방해하는 테스트는 하지 않습니다. 범위 밖 자산은 건드리지 않습니다.
+    - title: 이 해부로 공부하는 순서
+      style: ol
+      items:
+        - <b>14 → 7:</b> 로그인·결제·스마트스토어 흐름. 바운티와 가장 가깝다.
+        - <b>9 → 4:</b> NCP 무료 체험으로 IAM·Kubernetes(NKS)·Object Storage를 직접 만져 본다.
+        - <b>16 → 13:</b> HyperCLOVA X와 GPU 클러스터, 1784 로봇의 5G 특화망.
+        - <b>11 → 6:</b> 네이버 오픈소스 Pinpoint·ARCUS를 설치해 구조를 본다.
+        - <b>8 → 15:</b> LINE 사건을 원문 공지로 다시 읽고 공유 인증 체계가 왜 위험했는지 정리한다.
+        - <b>1 → 2:</b> 각 세종 공개 자료, 데이터센터 이중화 규제, 대규모 라이브 스트리밍 트래픽.
+      note: 영역마다 블로그 글 한 편으로 마무리하면 「네이버 인프라 해부」 시리즈가 됩니다.

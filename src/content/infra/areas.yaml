@@ -1,0 +1,321 @@
+# 인프라 16개 영역. id는 문자열 "1"~"16". oss는 oss/ 파일 이름(확장자 제외)을 참조
+- id: "1"
+  name: 물리
+  en: Facility & Hardware
+  bounty: lo
+  summary: 데이터센터, 전원(UPS), 냉각, 랙, 서버 하드웨어, BMC/IPMI, 회선
+  korea: 대형 서비스도 자체·임대 IDC 의존이 큼. 2022년 판교 데이터센터 화재로 카카오 서비스가 장기간 멈추며 이중화·DR이 사회 문제로 부각됨.
+  oss:
+    - openbmc
+    - redfish
+    - network-ups-tools
+  questions:
+    operator: 전원·회선·BMC를 왜 이중화하나?
+    attacker: BMC 관리망에 들어가면 서버 전원·콘솔을 쥔다
+    defender: BMC 접근 로그, 관리망 분리 여부
+  links:
+    - pm
+    - eol
+- id: "2"
+  name: 네트워크
+  en: Network
+  bounty: mid
+  summary: 라우팅, 방화벽·DMZ·망분리, 로드밸런서·프록시·CDN, VPN·VDI·ZTNA, DNS
+  korea: 공공·금융은 망분리가 의무 수준이고 국산 방화벽·VPN·망연계 솔루션 비중이 큼. 2021년 KT 전국 인터넷 장애는 라우팅 설정 오류가 원인으로 발표됨.
+  oss:
+    - nginx
+    - haproxy
+    - envoy
+    - bind
+    - coredns
+    - wireguard
+    - openvpn
+    - opnsense
+  questions:
+    operator: 트래픽이 어떤 장비를 거쳐 서버에 닿나?
+    attacker: 경계 VPN·방화벽은 인증 전 공격 표면 → 내부망 입구
+    defender: 경계 장비 로그, 비정상 세션
+  links:
+    - kev
+    - attack
+    - pm
+- id: "3"
+  name: 컴퓨팅·OS
+  en: Compute / OS
+  bounty: lo
+  summary: Linux 서버(서비스), Windows 서버(사내), 단말 Windows·macOS·모바일
+  korea: 서비스 서버는 Linux(RHEL 계열·Ubuntu), 사내는 Windows. 2025년 SKT 유심 정보 유출에서 Linux 서버에 잠복한 BPFDoor 악성코드가 확인됨.
+  oss:
+    - linux-kernel
+    - openssh
+    - systemd
+    - polkit
+    - sudo
+  questions:
+    operator: 서비스는 어떤 계정·권한으로 도나?
+    attacker: 일반 권한 → root, 서버 장악 후 장기 잠복
+    defender: 프로세스·네트워크 이상, EDR
+  links:
+    - attack
+    - eol
+- id: "4"
+  name: 가상화·컨테이너
+  en: Virtualization
+  bounty: mid
+  summary: VMware·Hyper-V·KVM·Proxmox, VDI, Docker·레지스트리, Kubernetes
+  korea: 공공·대기업 내부는 VMware 계열, 빅테크는 Kubernetes 기반 플랫폼이 표준. 기술블로그에 K8s 이전기가 많음.
+  oss:
+    - docker
+    - containerd
+    - runc
+    - kubernetes
+    - ingress-nginx
+    - harbor
+    - proxmox
+    - qemu
+  questions:
+    operator: 격리는 어디서 깨질 수 있나?
+    attacker: 컨테이너 → 노드 → 클러스터, 하이퍼바이저 → 모든 VM
+    defender: K8s audit log, 런타임 탐지
+  links:
+    - cncf
+    - k8saf
+    - kev
+- id: "5"
+  name: 스토리지·백업
+  en: Storage
+  bounty: mid
+  summary: SAN·iSCSI, NAS·NFS·SMB, S3 계열·Ceph, 백업·DR
+  korea: 중소 기업은 NAS 의존이 큼. 2017년 국내 웹호스팅 업체가 랜섬웨어로 서버와 백업이 함께 암호화돼 큰 피해를 입음.
+  oss:
+    - minio
+    - ceph
+    - samba
+    - nfs
+    - restic
+    - bacula
+  questions:
+    operator: 백업은 운영망과 분리돼 있나?
+    attacker: 공격자는 랜섬웨어 전에 백업부터 지운다
+    defender: 백업 삭제·대량 읽기 탐지
+  links:
+    - cncf
+    - kev
+- id: "6"
+  name: 데이터·미들웨어
+  en: Data & Middleware
+  bounty: mid
+  summary: Nginx·Apache·IIS·Tomcat, RDBMS·NoSQL, Redis, Kafka, Elasticsearch, API 게이트웨이
+  korea: 공공·금융은 상용 WAS(JEUS 등)와 Oracle·국산 DB, 빅테크는 Tomcat 내장 Spring Boot + MySQL·Redis·Kafka가 일반적.
+  oss:
+    - apache-tomcat
+    - apache-http-server
+    - redis
+    - apache-kafka
+    - elasticsearch
+    - kong
+    - apache-log4j
+  questions:
+    operator: 관리 포트·엔드포인트가 밖에 열려 있나?
+    attacker: 무인증 캐시·검색엔진은 데이터와 실행의 통로
+    defender: 미들웨어 접근 로그, 노출 스캔
+  links:
+    - kev
+    - eol
+    - osv
+- id: "7"
+  name: 아이덴티티
+  en: Identity & Access
+  bounty: hi
+  summary: AD·LDAP, Kerberos·NTLM, SAML·OAuth·OIDC, Entra ID·Okta, PKI, PAM
+  korea: 사내는 AD가 보편. 한국 특화로 휴대폰 본인인증, 공동인증서·금융인증서, 간편인증 연동이 서비스마다 붙어 있음.
+  oss:
+    - keycloak
+    - freeipa
+    - openldap
+    - samba-ad
+    - authelia
+  questions:
+    operator: 로그인 후 무엇이 신원을 증명하나(세션·토큰)?
+    attacker: 토큰·서명키·도메인 관리자 = 전부의 열쇠
+    defender: 인증 로그, 비정상 토큰 발급
+  links:
+    - attack
+    - h1
+- id: "8"
+  name: 사내 IT
+  en: Corporate IT
+  bounty: mid
+  summary: GPO·SCCM·Intune·MDM, 패치 관리, 메일·그룹웨어·메신저·파일 공유, SaaS
+  korea: 국산 그룹웨어·메신저와 PC 보안 에이전트(DRM, NAC, 키보드 보안 등) 설치 문화. 국산 SW 취약점은 KISA 신고포상제 대상.
+  oss:
+    - nextcloud
+    - zimbra
+    - mattermost
+    - rocket-chat
+    - roundcube
+  questions:
+    operator: 직원 PC는 누가 어떻게 관리하나?
+    attacker: 관리 서버 하나 = 전사 단말 장악
+    defender: 관리 도구 배포 이력, 메일 게이트웨이 로그
+  links:
+    - selfhost
+    - kev
+    - boho
+- id: "9"
+  name: 클라우드
+  en: Cloud
+  bounty: hi
+  summary: IaaS·PaaS·SaaS, AWS·Azure·GCP·국내 클라우드, IAM·VPC·스토리지
+  korea: 빅테크·스타트업은 AWS 비중이 큼. 공공은 CSAP 인증을 받은 국내 클라우드(네이버·KT·NHN 등)로 전환 중.
+  oss:
+    - localstack
+    - openstack
+    - terraform-aws-provider
+  questions:
+    operator: 이 서버의 IAM 역할은 무엇까지 할 수 있나?
+    attacker: SSRF 하나가 클라우드 계정 권한으로 번진다
+    defender: CloudTrail, 비정상 API 호출
+  links:
+    - attack
+    - h1
+- id: "10"
+  name: 자동화·배포
+  en: DevOps
+  bounty: hi
+  summary: Git·GitLab·GitHub, Jenkins·Actions·Argo CD, Terraform, Ansible, Vault
+  korea: 빅테크는 GitLab·Jenkins·Argo CD를 많이 쓰고 사내 구축형이 많음. GitLab 등은 제품 버그바운티를 운영.
+  oss:
+    - gitlab
+    - jenkins
+    - gitea
+    - argo-cd
+    - terraform
+    - ansible
+    - vault
+  questions:
+    operator: 코드가 배포되기까지 누가 무엇을 실행하나?
+    attacker: CI 러너와 비밀값 = 운영 환경 열쇠
+    defender: 파이프라인 변경 이력, 비밀값 접근
+  links:
+    - cncf
+    - kev
+    - h1
+- id: "11"
+  name: 운영·관측
+  en: Operations
+  bounty: mid
+  summary: Prometheus·Grafana·Zabbix, ELK·Loki, 트레이싱, 장애 대응, 고가용성
+  korea: Grafana·Prometheus·ELK는 국내 기술블로그에서도 표준 구성. 모니터링 도구는 전 서버에 접근 권한을 가짐.
+  oss:
+    - grafana
+    - prometheus
+    - zabbix
+    - kibana
+    - loki
+    - jaeger
+  questions:
+    operator: 모니터링 서버는 어떤 권한으로 어디에 접속하나?
+    attacker: 관측 도구 = 전 서버 지도와 자격증명
+    defender: 대시보드 접근, 에이전트 변경
+  links:
+    - cncf
+    - pm
+    - kev
+- id: "12"
+  name: 보안
+  en: Security
+  bounty: mid
+  summary: 방화벽·IPS·WAF·NAC, 백신·EDR, SIEM·SOC, 암호화·DLP, 취약점 관리
+  korea: 국산 보안 솔루션 비중이 큼(DRM, DLP, NAC, WAF, 망연계). 2023년 국산 보안 인증 SW가 국가 배후 공격에 악용됐다는 경보가 나옴(INISAFE CrossWeb EX, MagicLine4NX).
+  oss:
+    - wazuh
+    - suricata
+    - snort
+    - modsecurity
+    - osquery
+  questions:
+    operator: 보안 제품 자체는 누가 지키나?
+    attacker: 중앙 관리 서버 = 전 단말 배포 권한
+    defender: 보안 제품 정책 변경 이력
+  links:
+    - boho
+    - kev
+    - attack
+- id: "13"
+  name: 특수 인프라
+  en: Specialized
+  bounty: lo
+  summary: OT/ICS·SCADA, IoT(CCTV·출입통제·프린터), 이동통신망, GPU·HPC
+  korea: 제조업 OT, 건물 CCTV·출입통제 국산 장비 다수. 2025년 SKT 사건에서 가입자 인증 서버(HSS)가 쟁점이 됨.
+  oss:
+    - openplc
+    - home-assistant
+    - open5gs
+    - asterisk
+  questions:
+    operator: IT망과 OT망은 어떻게 이어져 있나?
+    attacker: IoT 기본 자격증명, IT → OT 경로
+    defender: OT 프로토콜 이상, 장비 펌웨어 무결성
+  links:
+    - ics
+    - kev
+- id: "14"
+  name: 애플리케이션
+  en: Application
+  bounty: hi
+  summary: Java/Spring·eGovFrame·PHP·Node·Python, 웹·API, 모바일 백엔드, 인증·세션, 본인확인·PG 연동
+  korea: 대형 서비스·공공·금융은 Java/Spring(공공은 전자정부 표준프레임워크), 중소 쇼핑몰·커뮤니티는 PHP(그누보드·영카트·Rhymix)가 여전히 강함.
+  oss:
+    - spring-framework
+    - egovframe
+    - gnuboard
+    - rhymix
+    - apache-struts
+    - express
+    - django
+  questions:
+    operator: 요청이 들어와 DB까지 어떻게 흐르나?
+    attacker: IDOR·인증 우회·업로드·비즈니스 로직 = 바운티 최다
+    defender: WAF·애플리케이션 로그
+  links:
+    - h1
+    - owasp
+    - ghsa
+- id: "15"
+  name: 소프트웨어 공급망
+  en: Supply Chain
+  bounty: mid
+  summary: Maven·npm·PyPI·Composer, 의존성, 빌드 산출물, 컨테이너 이미지
+  korea: Java 중심 생태계라 Maven 의존성 영향이 큼(Log4Shell 때 국내 대응 장기화).
+  oss:
+    - xz-utils
+    - maven-central
+    - npm
+    - pypi
+  questions:
+    operator: 우리 서비스는 무엇에 의존하나(SBOM)?
+    attacker: 유지보수자·빌드·레지스트리 장악
+    defender: 의존성 변경 감시, 서명 검증
+  links:
+    - osv
+    - ghsa
+- id: "16"
+  name: AI 인프라
+  en: AI Infrastructure
+  bounty: mid
+  summary: LLM 게이트웨이, 모델 서빙, RAG·벡터DB, 에이전트·MCP
+  korea: 빅테크·스타트업이 사내 LLM 게이트웨이와 에이전트 도구를 빠르게 도입 중. 새 코드가 많아 취약점 밀도가 높음.
+  oss:
+    - langflow
+    - langchain
+    - ollama
+    - vllm
+    - mcp-servers
+  questions:
+    operator: 에이전트는 어떤 도구·권한을 쓰나?
+    attacker: 프롬프트 → 도구 호출 → 파일·네트워크 권한
+    defender: 도구 호출 로그
+  links:
+    - atlas
+    - ghsa

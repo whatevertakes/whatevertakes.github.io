@@ -1,0 +1,10 @@
+title: 2023 ESXiArgs 랜섬웨어
+date: "2023"
+summary: 인터넷 노출 ESXi의 OpenSLP 취약점 → VM 일괄 암호화
+areas:
+  - "4"
+recent: false
+status: reported
+sources: []
+vulns:
+  - CVE-2021-21974

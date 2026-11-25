@@ -1,0 +1,22 @@
+name: Check site build
+
+# PR마다 사이트를 빌드한다. 인프라 지도 데이터(src/content/infra/)의
+# 스키마 오류나 깨진 ID 참조가 있으면 빌드가 실패한다.
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build

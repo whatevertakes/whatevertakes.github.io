@@ -1,0 +1,40 @@
+name: 카카오
+region: kr
+order: 2
+tag: 메신저·모빌리티·핀테크
+services:
+  - name: 카카오톡·오픈채팅
+    areas:
+      - "14"
+      - "7"
+      - "6"
+  - name: 카카오페이·카카오뱅크(계열)
+    areas:
+      - "14"
+      - "7"
+  - name: 카카오T·카카오맵
+    areas:
+      - "14"
+      - "9"
+  - name: 카카오클라우드
+    areas:
+      - "9"
+      - "4"
+infra: 2022년 판교 데이터센터 화재 이후 자체 데이터센터(안산)를 지어 이중화를 강화. 사내 Kubernetes 플랫폼 이전기가 기술블로그에 다수.
+incidents:
+  - date: "2022"
+    text: 판교 데이터센터 화재로 카카오톡 등 장기 장애 (전원·이중화)
+    areas:
+      - "1"
+      - "11"
+  - date: "2024"
+    text: 오픈채팅 이용자 정보 유출로 개인정보위 과징금 약 151억 원
+    areas:
+      - "14"
+      - "7"
+bounty:
+  status: yes
+  note: 자체 버그바운티 운영. 포상 5만~1,000만 원(보도 기준). 외국인 지급 제한 논란 보도
+  url: https://www.ekoreanews.co.kr/news/articleView.html?idxno=74087
+tip: 메신저 → 결제 → 모빌리티로 이어지는 계정 연동이 핵심 공격 표면(7). 화재 사례는 물리·이중화 공부의 교과서.
+blog: https://tech.kakao.com/

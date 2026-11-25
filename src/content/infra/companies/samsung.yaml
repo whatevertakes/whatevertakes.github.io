@@ -1,0 +1,40 @@
+name: 삼성 (삼성전자·삼성SDS)
+region: kr
+order: 11
+tag: 단말·가전·IT 서비스
+services:
+  - name: Galaxy 스마트폰(Android·One UI)
+    areas:
+      - "3"
+      - "14"
+  - name: 스마트TV(Tizen)·가전, SmartThings
+    areas:
+      - "13"
+      - "3"
+  - name: 삼성 월렛·페이
+    areas:
+      - "14"
+      - "7"
+  - name: 삼성SDS 클라우드(SCP)·IT 서비스
+    areas:
+      - "9"
+      - "8"
+      - "10"
+infra: 단말 OS·펌웨어부터 IoT 허브, 그룹 IT(SDS)까지 수직 계열. 그룹 사내망은 SDS가 운영하는 구조.
+incidents:
+  - date: "2022"
+    text: Lapsus$ 그룹이 Galaxy 관련 소스코드 등 대량 내부 데이터 유출 공개
+    areas:
+      - "15"
+      - "10"
+  - date: "2023"
+    text: 직원이 생성형 AI에 사내 소스코드를 입력한 사례가 알려져 사내 생성형 AI 사용 제한
+    areas:
+      - "16"
+      - "8"
+bounty:
+  status: yes
+  note: Samsung Mobile Security 보상 프로그램 운영. 삼성SDS도 자체 신고 채널 운영(보도 기준)
+  url: https://security.samsungmobile.com/
+tip: 모바일·펌웨어(3)와 IoT(13)는 바운티 단가가 높은 분야. 소스코드 유출·AI 입력 사고는 공급망(15)·AI(16) 관점 사례.
+blog: https://research.samsung.com/blog

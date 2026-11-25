@@ -1,0 +1,359 @@
+---
+// WT 인프라 지도. 데이터는 src/content/infra/ 의 YAML이고, 검사·변환은 src/lib/infra-data.ts 가 한다.
+import { loadInfraData } from '../../../lib/infra-data';
+const data = await loadInfraData();
+const json = JSON.stringify(data).replace(/</g, '\\u003c');
+---
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="인프라 16개 영역을 오픈소스·취약점·사건·기업과 연결한 WhateverTakes 학습 지도">
+<title>WT 인프라 지도 | WhateverTakes</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style is:inline>
+/* Layout: 검색 바 → 16개 영역 타일 그리드 → 선택 영역 상세 패널 (데스크톱은 오른쪽 고정, 폰은 아래). 색인 탭은 사건·CVE → 영역 표 */
+:root{
+  --bg:#f5f6f8; --surface:#ffffff; --line:#dde1e8; --fg:#1b2130; --muted:#5d6678;
+  --accent:#2f5fd0; --accent-soft:#e6edfb;
+  --hi:#b3261e; --hi-soft:#fbe9e7; --mid:#9a6700; --mid-soft:#fdf3dc; --lo:#4b5563; --lo-soft:#eceef2;
+  --done:#1f7a4d; --done-soft:#e3f4ea;
+  --sans:"IBM Plex Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12151b; --surface:#1a1f27; --line:#2c3340; --fg:#e6e9ef; --muted:#9aa3b5;
+  --accent:#7ea2ff; --accent-soft:#1f2a44;
+  --hi:#ff8a80; --hi-soft:#3a1f1d; --mid:#f2c14e; --mid-soft:#352a12; --lo:#b4bccb; --lo-soft:#262c36;
+  --done:#6fd39c; --done-soft:#17301f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12151b; --surface:#1a1f27; --line:#2c3340; --fg:#e6e9ef; --muted:#9aa3b5;
+  --accent:#7ea2ff; --accent-soft:#1f2a44;
+  --hi:#ff8a80; --hi-soft:#3a1f1d; --mid:#f2c14e; --mid-soft:#352a12; --lo:#b4bccb; --lo-soft:#262c36;
+  --done:#6fd39c; --done-soft:#17301f; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.55}
+.wrap{max-width:1240px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:16px}
+h1{font-size:1.5rem;margin:0;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:2px 0 0;font-size:.9rem}
+.tabs{display:flex;gap:4px;background:var(--lo-soft);padding:4px;border-radius:8px}
+.tabs button{border:0;background:transparent;color:var(--muted);font:500 .9rem var(--sans);padding:6px 12px;border-radius:6px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+#q{flex:1 1 280px;min-width:0;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg);font:inherit}
+#q:focus,select:focus,button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+select{padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg);font:inherit}
+.main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,440px);gap:20px;align-items:start}
+@media (max-width:900px){.main{grid-template-columns:minmax(0,1fr)}}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.tile{display:flex;flex-direction:column;gap:6px;text-align:left;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--fg);cursor:pointer;font:inherit;min-width:0}
+.tile:hover{border-color:var(--accent)}
+.tile[aria-current="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.tile.dim{opacity:.35}
+.tile .top{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.num{font:500 .78rem var(--mono);color:var(--muted)}
+.tile h3{margin:0;font-size:1rem}
+.tile p{margin:0;color:var(--muted);font-size:.82rem;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.hit{font-size:.78rem;color:var(--accent)}
+.pill{display:inline-block;font-size:.72rem;font-weight:500;padding:1px 7px;border-radius:999px;white-space:nowrap}
+.b-hi{background:var(--hi-soft);color:var(--hi)} .b-mid{background:var(--mid-soft);color:var(--mid)} .b-lo{background:var(--lo-soft);color:var(--lo)}
+.s-doing{background:var(--accent-soft);color:var(--accent)} .s-done{background:var(--done-soft);color:var(--done)}
+.panel{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;max-height:calc(100vh - 24px);overflow:auto;min-width:0}
+@media (max-width:900px){.panel{position:static;max-height:none}}
+.panel h2{margin:0 0 2px;font-size:1.25rem;text-wrap:balance}
+.panel .path{color:var(--muted);font-size:.85rem;margin:0 0 12px}
+.sec{margin-top:16px}
+.sec h4{margin:0 0 6px;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:.85rem;padding:3px 9px;border:1px solid var(--line);border-radius:6px;color:var(--fg);text-decoration:none;background:var(--bg)}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.list li{font-size:.9rem}
+.cve{font-family:var(--mono);font-size:.82rem;color:var(--accent);text-decoration:none}
+.cve:hover{text-decoration:underline}
+.kr{background:var(--accent-soft);border-radius:8px;padding:10px 12px;font-size:.9rem}
+.q3{display:grid;gap:6px}
+.q3 div{font-size:.88rem}
+.q3 b{display:inline-block;min-width:3.2em;color:var(--muted);font-weight:500}
+.status{display:flex;gap:6px;margin-top:4px}
+.status button{flex:1;border:1px solid var(--line);background:var(--bg);color:var(--muted);font:500 .85rem var(--sans);padding:6px;border-radius:6px;cursor:pointer}
+.status button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.note{font-size:.78rem;color:var(--muted);margin-top:16px}
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:.88rem}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.75rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);background:var(--bg);position:sticky;top:0}
+td a.area{color:var(--accent);text-decoration:none;cursor:pointer}
+/* 기업 해부 화면 */
+.dp-top{display:flex;align-items:center;gap:12px}
+.dp-back{border:1px solid var(--line);background:var(--surface);color:var(--fg);font:500 .88rem var(--sans);padding:6px 12px;border-radius:8px;cursor:pointer}
+.dp-back:hover{border-color:var(--accent);color:var(--accent)}
+.dp-h1{font-size:1.4rem;margin:12px 0 0}
+.dp-h2{font-size:1.05rem;margin:28px 0 10px}
+.dp-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:16px}
+.dp-fact{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:0}
+.dp-fact .k{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.dp-fact .v{font-weight:700;margin-top:2px}
+.dp-fact .d{font-size:.85rem;color:var(--muted)}
+table.mx{min-width:900px;font-size:.82rem}
+.mx th,.mx td{padding:6px 4px;text-align:center;text-transform:none;letter-spacing:0}
+.mx th:first-child,.mx td:first-child{text-align:left;padding-left:12px;white-space:nowrap;position:sticky;left:0;background:var(--surface);z-index:1}
+.mx thead th{vertical-align:bottom}
+.mx thead th button{border:0;background:none;color:var(--muted);font:500 .72rem var(--mono);cursor:pointer;padding:0}
+.mx thead th button:hover{color:var(--accent)}
+.mx thead th span{display:block;font:500 .7rem var(--sans);writing-mode:vertical-rl;margin:4px auto 0;max-height:7.5em}
+.dot{display:inline-block;width:14px;height:14px;border-radius:50%;vertical-align:-2px}
+.d2{background:var(--accent)} .d1{background:var(--accent-soft);border:1px solid var(--accent)}
+.dp-areas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:860px){.dp-areas{grid-template-columns:minmax(0,1fr)}}
+.dp-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0;scroll-margin-top:16px}
+.dp-card.flash{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.dp-card .hd{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.dp-card h4{margin:0;font-size:1rem}
+.dp-row{margin-top:10px}
+.dp-row .lab{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.dp-row p{margin:0;font-size:.92rem}
+.dp-risk{background:var(--hi-soft);border-radius:8px;padding:8px 10px}
+.dp-tl{list-style:none;margin:0;padding:0;border-left:2px solid var(--line);display:flex;flex-direction:column;gap:12px}
+.dp-tl li{position:relative;padding-left:18px}
+.dp-tl li::before{content:"";position:absolute;left:-7px;top:.55em;width:12px;height:12px;border-radius:50%;background:var(--surface);border:2px solid var(--accent)}
+.dp-tl li.bad::before{border-color:var(--hi);background:var(--hi-soft)}
+.dp-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:860px){.dp-two{grid-template-columns:minmax(0,1fr)}}
+.dp-box{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+.dp-box h4{margin:0 0 8px;font-size:1rem}
+.dp-box ul,.dp-box ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px;font-size:.92rem}
+.linkbtn{border:0;background:none;color:var(--accent);font:inherit;cursor:pointer;padding:0;text-decoration:underline}
+.new26{font-size:.75rem;color:var(--hi)}
+.sec26{border:1px solid var(--hi-soft);background:color-mix(in srgb,var(--hi-soft) 45%,transparent);border-radius:8px;padding:10px 12px}
+.date{font:500 .75rem var(--mono);color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.8rem;color:var(--muted);margin:0 0 12px}
+.empty{color:var(--muted);padding:24px;text-align:center}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+body{margin:0}
+.sitebar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:.85rem;color:var(--muted);margin-bottom:12px}
+.sitebar a{color:var(--muted);text-decoration:none}.sitebar a:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+<script id="wt-infra-data" type="application/json" set:html={json}></script>
+<div class="wrap">
+  <div class="sitebar"><a href="/ko/">← WhateverTakes</a><span>공개 자료 기반 · 영역 {data.counts.areas} · 취약점 {data.counts.vulns} · 사건 {data.counts.incidents} · 기업 {data.counts.companies} · <a href="https://github.com/whatevertakes/whatevertakes.github.io/tree/main/src/content/infra">데이터 ↗</a></span></div>
+  <header>
+    <div>
+      <h1>WT 인프라 지도</h1>
+      <p class="sub">인프라 16개 영역 → 오픈소스 → 취약점 → 사건. 영역을 골라 바로 공부하고, 이슈를 검색해 어디서 터졌는지 확인합니다.</p>
+    </div>
+    <div class="tabs" role="tablist">
+      <button role="tab" id="tab-map" aria-selected="true">영역 지도</button>
+      <button role="tab" id="tab-idx" aria-selected="false">사건·CVE 색인</button>
+      <button role="tab" id="tab-co" aria-selected="false">기업</button>
+    </div>
+  </header>
+
+  <div class="controls">
+    <input id="q" type="search" placeholder="검색: VPN, Grafana, Log4Shell, CVE-2024-3094, 카카오 …" autocomplete="off">
+    <select id="fb" aria-label="바운티 연결도"><option value="">바운티 연결 전체</option><option value="hi">상</option><option value="mid">중</option><option value="lo">하</option></select>
+    <select id="fs" aria-label="공부 상태"><option value="">상태 전체</option><option value="none">미착수</option><option value="doing">공부 중</option><option value="done">완료</option></select>
+    <select id="fr" aria-label="취약점 위험도"><option value="">위험도 전체 (CVSS)</option><option value="c">긴급 9.0 이상</option><option value="h">높음 7.0~8.9</option><option value="m">중간 이하 7.0 미만</option></select>
+  </div>
+
+  <section id="view-map">
+    <div class="legend"><span><span class="pill b-hi">상</span> <span class="pill b-mid">중</span> <span class="pill b-lo">하</span> 버그바운티 연결도</span><span>2026 최신 = CISA KEV(실제 악용 확인) 2026년 등재분, 기준일 2026-11-24</span><span>상태는 이 브라우저에만 저장됩니다</span></div>
+    <div class="main">
+      <div class="grid" id="grid"></div>
+      <aside class="panel" id="panel" aria-live="polite"></aside>
+    </div>
+  </section>
+
+  <section id="view-co" hidden>
+    <div class="legend"><span>서비스 → 인프라 영역 → 보안 사건 → 신고 채널. 영역 칩을 누르면 지도로 이동합니다</span><span>기술 스택은 각 사 공개 기술블로그·발표 기준 경향입니다</span></div>
+    <div class="main">
+      <div class="grid" id="cogrid"></div>
+      <aside class="panel" id="copanel" aria-live="polite"></aside>
+    </div>
+  </section>
+
+  <section id="view-deep" hidden>
+    <div class="dp-top"><button class="dp-back" id="dp-back">← 기업 목록</button><span class="num">기업 해부 · 16개 영역</span></div>
+    <h2 class="dp-h1" id="dp-title"></h2>
+    <p class="sub" id="dp-sub"></p>
+    <div class="dp-facts" id="dp-facts"></div>
+    <h3 class="dp-h2">서비스 × 16개 영역</h3>
+    <div class="tblwrap"><table class="mx" id="dp-mx"></table></div>
+    <div class="legend" style="margin-top:8px"><span><span class="dot d2"></span>핵심 의존</span><span><span class="dot d1"></span>관련</span><span>영역 번호를 누르면 아래 카드로 이동합니다. 연결은 공개 자료 기반 분석입니다</span></div>
+    <h3 class="dp-h2">16개 영역별 분석</h3>
+    <div class="dp-areas" id="dp-areas"></div>
+    <h3 class="dp-h2">사건·변화 타임라인</h3>
+    <ul class="dp-tl" id="dp-tl"></ul>
+    <h3 class="dp-h2">WT 관점에서 쓰는 법</h3>
+    <div class="dp-two" id="dp-use"></div>
+  </section>
+
+  <section id="view-idx" hidden>
+    <div class="tblwrap"><table><thead><tr><th>사건·CVE</th><th>연도</th><th>무엇이 터졌나</th><th>영역</th></tr></thead><tbody id="idx"></tbody></table></div>
+    <p class="note">사건의 세부 원인은 공식 발표·사후 분석 보고서로 확인하세요. 이 표는 공부 출발점용 요약입니다.</p>
+  </section>
+</div>
+<script is:inline>const L = {
+  nvd: s => "https://nvd.nist.gov/vuln/search/results?form_type=Basic&results_type=overview&query=" + encodeURIComponent(s),
+  ghsa: s => "https://github.com/advisories?query=" + encodeURIComponent(s),
+  kev: s => "https://www.cisa.gov/known-exploited-vulnerabilities-catalog?search_api_fulltext=" + encodeURIComponent(s),
+  cve: id => "https://nvd.nist.gov/vuln/detail/" + id
+};
+const {A,N26,I26,SEV,DB,CO,DEEP}=JSON.parse(document.getElementById('wt-infra-data').textContent);
+const cveIds = t => (String(t).match(/CVE-\d{4}-\d{4,}/g)||[]);
+const maxSev = t => cveIds(t).reduce((m,id)=>SEV[id]&&SEV[id][0]>m?SEV[id][0]:m,-1);
+const bucket = s => s<0?"":s>=9?"c":s>=7?"h":"m";
+const SEVL = {c:["긴급","b-hi"],h:["높음","b-mid"],m:["중간 이하","b-lo"]};
+function sevPill(t){ const s=maxSev(t); if(s<0) return ""; const b=bucket(s); return ` <span class="pill ${SEVL[b][1]}" title="CVSS 기본 점수">${SEVL[b][0]} ${s}</span>` }
+function areaHasSev(a,fr){ return [...a.cves.map(c=>c[0]),...n26(a).map(c=>c[0]),...i26(a).map(i=>i[0]+" "+i[1])].some(t=>cveIds(t).some(id=>SEV[id]&&bucket(SEV[id][0])===fr)) }
+
+const $ = s => document.querySelector(s);
+const BL = {hi:"상",mid:"중",lo:"하"}, SL = {none:"미착수",doing:"공부 중",done:"완료"};
+let state = {}; try{ state = JSON.parse(localStorage.getItem("wt-infra-status")||"{}") }catch(e){}
+const save = () => { try{ localStorage.setItem("wt-infra-status", JSON.stringify(state)) }catch(e){} };
+let cur = 14;
+
+const n26 = a => N26[a.id]||[], i26 = a => I26[a.id]||[];
+function hay(a){ return [a.name,a.en,a.sum,a.kr,...a.oss,...a.cves.flat(),...a.inc.flat(),...n26(a).flat(),...i26(a).flat()].join(" ").toLowerCase() }
+function hits(a,q){
+  if(!q) return null;
+  const out=[]; a.oss.forEach(o=>o.toLowerCase().includes(q)&&out.push(o));
+  [...a.cves,...n26(a)].forEach(c=>(c[0]+" "+c[c.length===2?1:2]).toLowerCase().includes(q)&&out.push(c[0]));
+  [...a.inc,...i26(a)].forEach(i=>(i[0]+" "+i[1]).toLowerCase().includes(q)&&out.push(i[0]));
+  return out;
+}
+function esc(s){ return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])) }
+
+function renderGrid(){
+  const q=$("#q").value.trim().toLowerCase(), fb=$("#fb").value, fs=$("#fs").value, fr=$("#fr").value;
+  $("#grid").innerHTML = A.map(a=>{
+    const st=state[a.id]||"none";
+    const match = (!q||hay(a).includes(q)) && (!fb||a.b===fb) && (!fs||st===fs) && (!fr||areaHasSev(a,fr));
+    const h=hits(a,q);
+    return `<button class="tile${match?"":" dim"}" data-id="${a.id}" aria-current="${a.id===cur}">
+      <div class="top"><span class="num">${String(a.id).padStart(2,"0")} · ${a.en}</span><span class="pill b-${a.b}">${BL[a.b]}</span></div>
+      <h3>${a.name}</h3><p>${a.sum}</p>
+      <span class="new26">2026 실제 악용 ${n26(a).length}건${i26(a).length?` · 사건 ${i26(a).length}`:""}</span>
+      ${st!=="none"?`<span><span class="pill s-${st}">${SL[st]}</span></span>`:""}
+      ${h&&h.length?`<span class="hit">일치: ${esc(h.slice(0,3).join(", "))}</span>`:""}
+    </button>`}).join("");
+}
+function renderPanel(){
+  const a=A.find(x=>x.id===cur), st=state[a.id]||"none";
+  $("#panel").innerHTML = `
+    <h2>${String(a.id).padStart(2,"0")} ${a.name}</h2>
+    <p class="path">${a.en} · 바운티 연결 <span class="pill b-${a.b}">${BL[a.b]}</span></p>
+    <div class="status" role="group" aria-label="공부 상태">${Object.keys(SL).map(k=>`<button data-st="${k}" aria-pressed="${st===k}">${SL[k]}</button>`).join("")}</div>
+    <div class="sec"><h4>구성</h4><div>${a.sum}</div></div>
+    <div class="sec"><h4>한국 현실</h4><div class="kr">${a.kr}</div></div>
+    <div class="sec"><h4>대표 오픈소스 · 누르면 NVD 취약점 검색</h4><div class="chips">${a.oss.map(o=>`<a class="chip" href="${L.nvd(o)}" target="_blank" rel="noopener">${esc(o)}</a>`).join("")}</div>
+      <div class="chips" style="margin-top:6px">${a.oss.slice(0,4).map(o=>`<a class="chip" href="${L.ghsa(o)}" target="_blank" rel="noopener">GHSA: ${esc(o)}</a>`).join("")}</div></div>
+    <div class="sec sec26"><h4>2026 최신 · CISA KEV 실제 악용 (등재일)</h4>${n26(a).length?`<ul class="list">${n26(a).map(c=>`<li><a class="cve" href="${L.cve(c[0])}" target="_blank" rel="noopener">${c[0]}</a> <span class="date">${c[1].slice(5)}</span>${sevPill(c[0])}${c[3]?` <span class="pill b-hi">랜섬웨어</span>`:""}<br>${esc(c[2])}</li>`).join("")}</ul>`:`<div class="note" style="margin:0">이 영역의 2026년 KEV 등재 항목이 없습니다.</div>`}
+      ${i26(a).length?`<ul class="list" style="margin-top:10px">${i26(a).map(i=>`<li><b>${esc(i[0])}</b>${sevPill(i[0]+" "+i[1])}${i[2]?` <a class="cve" href="${i[2]}" target="_blank" rel="noopener">출처 ↗</a>`:""}<br><span style="color:var(--muted)">${esc(i[1])}</span></li>`).join("")}</ul>`:""}</div>
+    <div class="sec"><h4>대표 취약점 (기본기)</h4>${a.cves.length?`<ul class="list">${a.cves.map(c=>`<li><a class="cve" href="${L.cve(c[0])}" target="_blank" rel="noopener">${c[0]}</a>${sevPill(c[0])} ${esc(c[1])}</li>`).join("")}</ul>`:`<div class="note" style="margin:0">클라우드는 제품 CVE보다 설정·권한 사고가 중심입니다. 아래 사건과 Hacktivity의 SSRF·IAM 리포트로 시작하세요.</div>`}</div>
+    <div class="sec"><h4>기준 사건</h4><ul class="list">${a.inc.map(i=>`<li><b>${esc(i[0])}</b><br><span style="color:var(--muted)">${esc(i[1])}</span></li>`).join("")}</ul></div>
+    ${Object.keys(DEEP).map(k=>{const d=DEEP[k].cards[a.id];const co=CO.find(x=>x.id===k);return d?`<div class="sec"><h4>기업 사례 · ${co.name}</h4><div style="font-size:.9rem">${esc(d[0])}</div><button class="linkbtn" data-deep="${k}" data-area="${a.id}" style="margin-top:4px;font-size:.85rem">${co.name} 해부에서 이 영역 보기 →</button></div>`:""}).join("")}
+    <div class="sec"><h4>세 가지 시선</h4><div class="q3"><div><b>운영자</b>${a.q[0]}</div><div><b>공격자</b>${a.q[1]}</div><div><b>방어자</b>${a.q[2]}</div></div></div>
+    <div class="sec"><h4>바로가기</h4><div class="chips">${a.db.map(k=>`<a class="chip" href="${DB[k][1]}" target="_blank" rel="noopener">${DB[k][0]} ↗</a>`).join("")}
+      <a class="chip" href="${L.kev(a.oss[0])}" target="_blank" rel="noopener">KEV: ${esc(a.oss[0])} ↗</a></div></div>
+    <p class="note">사건 원인은 공식 발표·사후 분석 보고서로 다시 확인하세요.</p>`;
+}
+function renderIdx(){
+  const q=$("#q").value.trim().toLowerCase(); const rows=[];
+  A.forEach(a=>{
+    a.inc.forEach(i=>rows.push({k:i[0],y:(i[0].match(/\d{4}/)||[""])[0],d:i[1],a,link:null}));
+    a.cves.forEach(c=>rows.push({k:c[0],y:c[0].split("-")[1],d:c[1],a,link:L.cve(c[0])}));
+    n26(a).forEach(c=>rows.push({k:c[0],y:"2026",d:c[2],a,link:L.cve(c[0])}));
+    i26(a).forEach(i=>rows.push({k:i[0],y:"2026",d:i[1],a,link:null}));
+  });
+  const fr=$("#fr").value;
+  const f=rows.filter(r=>(!fr||bucket(maxSev(r.k+" "+r.d))===fr)&&(!q||(r.k+" "+r.d+" "+r.a.name+" "+r.a.en).toLowerCase().includes(q))).sort((x,y)=>y.y.localeCompare(x.y));
+  $("#idx").innerHTML = f.length? f.map(r=>`<tr><td>${r.link?`<a class="cve" href="${r.link}" target="_blank" rel="noopener">${r.k}</a>`:`<b>${esc(r.k)}</b>`}${sevPill(r.k+" "+r.d)}</td><td style="font-variant-numeric:tabular-nums">${r.y}</td><td>${esc(r.d)}</td><td><a class="area" data-go="${r.a.id}" tabindex="0">${String(r.a.id).padStart(2,"0")} ${r.a.name}</a></td></tr>`).join("")
+    : `<tr><td colspan="4" class="empty">일치하는 사건·CVE가 없습니다. 영역 지도 탭의 오픈소스 칩으로 NVD를 검색해 보세요.</td></tr>`;
+}
+let coCur="naver";
+const aName = id => { const a=A.find(x=>x.id===id); return String(id).padStart(2,"0")+" "+a.name };
+const areaChip = id => `<a class="chip" href="#a${id}" data-go="${id}">${aName(id)}</a>`;
+function coHay(c){ return [c.name,c.tag,c.infra,c.tip,...c.svc.map(s=>s[0]),...c.inc.map(i=>i[0]+" "+i[1]),c.bb[1]].join(" ").toLowerCase() }
+function renderCoGrid(){
+  const q=$("#q").value.trim().toLowerCase();
+  $("#cogrid").innerHTML = CO.map(c=>`<button class="tile${!q||coHay(c).includes(q)?"":" dim"}" data-co="${c.id}" aria-current="${c.id===coCur}">
+      <div class="top"><span class="num">${c.kr?"국내":"해외"}</span>${c.bb[0]==="y"?`<span class="pill s-done">바운티</span>`:""}</div>
+      <h3>${c.name}</h3><p>${c.tag}</p>
+      ${c.inc.length?`<span class="new26">보안 사건 ${c.inc.length}건 · 최근 ${c.inc.map(i=>i[0]).sort().slice(-1)[0]}</span>`:""}
+    </button>`).join("");
+}
+function renderCoPanel(){
+  const c=CO.find(x=>x.id===coCur);
+  const bbTxt={y:"운영",n:"없음","?":"확인 필요"}[c.bb[0]];
+  $("#copanel").innerHTML = `
+    <h2>${c.name}</h2>
+    <p class="path">${c.kr?"국내":"해외"} · ${c.tag}</p>
+    <div class="sec"><h4>서비스 → 연결된 인프라 영역</h4><ul class="list">${c.svc.map(s=>`<li><b>${esc(s[0])}</b><div class="chips" style="margin-top:4px">${s[1].map(areaChip).join("")}</div></li>`).join("")}</ul></div>
+    <div class="sec"><h4>공개된 인프라·기술</h4><div class="kr">${esc(c.infra)}</div></div>
+    <div class="sec${c.inc.some(i=>i[0].includes("202"))?" sec26":""}"><h4>보안 사건</h4>${c.inc.length?`<ul class="list">${c.inc.map(i=>`<li><span class="date">${i[0]}</span> ${esc(i[1])}${i[3]?` <a class="cve" href="${i[3]}" target="_blank" rel="noopener">출처 ↗</a>`:""}<div class="chips" style="margin-top:4px">${i[2].map(areaChip).join("")}</div></li>`).join("")}</ul>`:`<div class="note" style="margin:0">공개된 대형 보안 사건이 없습니다.</div>`}</div>
+    <div class="sec"><h4>버그바운티·신고 채널 · ${bbTxt}</h4><div>${esc(c.bb[1])}${c.bb[2]?` <a class="cve" href="${c.bb[2]}" target="_blank" rel="noopener">↗</a>`:""}</div></div>
+    <div class="sec"><h4>실무 포인트</h4><div>${esc(c.tip)}</div></div>
+    ${DEEP[c.id]?`<div class="sec"><button class="dp-back" data-deep="${c.id}" style="width:100%">16개 영역 해부 보기 →</button></div>`:""}
+    ${c.blog?`<div class="sec"><h4>바로가기</h4><div class="chips"><a class="chip" href="${c.blog}" target="_blank" rel="noopener">공식 기술블로그 ↗</a></div></div>`:""}
+    <p class="note">사건 내용은 보도·공식 발표 기준 요약입니다. 수치와 원인은 원문으로 확인하세요.</p>`;
+}
+function go(id){ cur=id; try{ history.replaceState(null,"","#a"+id) }catch(e){ location.hash="a"+id } renderGrid(); renderPanel(); }
+function renderDeep(id,areaId){
+  const d=DEEP[id], c=CO.find(x=>x.id===id);
+  $("#dp-title").textContent=c.name+" 인프라 해부";
+  $("#dp-sub").textContent=d.sub;
+  $("#dp-facts").innerHTML=d.facts.map(f=>`<div class="dp-fact"><div class="k">${f[0]}</div><div class="v">${esc(f[1])}</div><div class="d">${esc(f[2])}</div></div>`).join("");
+  $("#dp-mx").innerHTML=`<thead><tr><th>서비스</th>${A.map(a=>`<th><button data-scroll="${a.id}">${String(a.id).padStart(2,"0")}<span>${a.name}</span></button></th>`).join("")}</tr></thead><tbody>`+
+    d.svc.map(s=>`<tr><td>${esc(s[0])}</td>${A.map(a=>{const v=s[1][a.id];return `<td>${v?`<span class="dot d${v}" title="${esc(s[0])} · ${a.name}: ${v===2?"핵심 의존":"관련"}"></span>`:""}</td>`}).join("")}</tr>`).join("")+`</tbody>`;
+  $("#dp-areas").innerHTML=A.map(a=>{const x=d.cards[a.id]; if(!x) return ""; const used=d.svc.filter(s=>s[1][a.id]===2).map(s=>s[0]); return `
+    <article class="dp-card" id="dp-area-${a.id}">
+      <div class="hd"><h4>${a.name}</h4><span class="num">${String(a.id).padStart(2,"0")}</span></div>
+      ${used.length?`<div class="dp-row"><div class="lab">핵심 의존 서비스</div><p>${esc(used.join(", "))}</p></div>`:""}
+      <div class="dp-row"><div class="lab">${esc(c.name)}에서는</div><p>${esc(x[0])}</p></div>
+      <div class="dp-row dp-risk"><div class="lab">보안 관점</div><p>${esc(x[1])}</p></div>
+      <div class="dp-row"><div class="lab">공부할 것</div><p>${esc(x[2])}</p></div>
+      <div class="dp-row" style="font-size:.82rem">${x[3].map(s=>`<a class="cve" href="${s[1]}" target="_blank" rel="noopener">${esc(s[0])} ↗</a>`).join(" · ")}${x[3].length?" · ":""}<button class="linkbtn" data-go="${a.id}">지도에서 ${a.name} 영역 보기 →</button></div>
+    </article>`}).join("");
+  $("#dp-tl").innerHTML=d.tl.map(t=>`<li class="${t[2]?"bad":""}"><div class="date">${t[0]}</div><div style="font-size:.92rem">${esc(t[1])}</div></li>`).join("");
+  $("#dp-use").innerHTML=d.use.map(u=>`<div class="dp-box"><h4>${esc(u[0])}</h4><${u[1]}>${u[2].map(li=>`<li>${li}</li>`).join("")}</${u[1]}><p class="note">${esc(u[3])}</p></div>`).join("");
+  tab("deep");
+  if(areaId) requestAnimationFrame(()=>scrollToCard(areaId)); else scrollTo(0,0);
+}
+function scrollToCard(id){ const el=$("#dp-area-"+id); if(!el) return; el.scrollIntoView({behavior:"smooth",block:"start"}); document.querySelectorAll(".dp-card.flash").forEach(x=>x.classList.remove("flash")); el.classList.add("flash"); }
+$("#view-deep").addEventListener("click",e=>{
+  const s=e.target.closest("[data-scroll]"); if(s){ scrollToCard(+s.dataset.scroll); return; }
+  const g=e.target.closest("[data-go]"); if(g){ tab("map"); go(+g.dataset.go); scrollTo(0,0); }
+});
+$("#dp-back").addEventListener("click",()=>tab("co"));
+document.addEventListener("click",e=>{const b=e.target.closest("[data-deep]"); if(b){ if(b.dataset.deep!==coCur) coCur=b.dataset.deep; renderDeep(b.dataset.deep, b.dataset.area?+b.dataset.area:0); }});
+function tab(which){
+  const map=which==="map";
+  ["map","idx","co","deep"].forEach(k=>{ $("#view-"+k).hidden=k!==which; const t=$("#tab-"+k); if(t) t.setAttribute("aria-selected",k===which||(k==="co"&&which==="deep")) });
+  $("#fb").hidden=!map; $("#fs").hidden=!map; $("#fr").hidden=which==="co"||which==="deep";
+  $("#q").hidden=which==="deep";
+  if(which==="idx") renderIdx(); if(which==="co"){ renderCoGrid(); renderCoPanel(); }
+}
+$("#tab-co").addEventListener("click",()=>tab("co"));
+$("#cogrid").addEventListener("click",e=>{const t=e.target.closest("[data-co]"); if(t){ coCur=t.dataset.co; renderCoGrid(); renderCoPanel(); if(innerWidth<=900) $("#copanel").scrollIntoView({behavior:"smooth"}) }});
+$("#copanel").addEventListener("click",e=>{const a=e.target.closest("[data-go]"); if(a){ e.preventDefault(); tab("map"); go(+a.dataset.go) }});
+$("#grid").addEventListener("click",e=>{const t=e.target.closest(".tile"); if(t){ go(+t.dataset.id); if(innerWidth<=900) $("#panel").scrollIntoView({behavior:"smooth"}) }});
+$("#panel").addEventListener("click",e=>{const b=e.target.closest("[data-st]"); if(b){ state[cur]=b.dataset.st; save(); renderGrid(); renderPanel(); }});
+$("#idx").addEventListener("click",e=>{const a=e.target.closest("[data-go]"); if(a){ tab("map"); go(+a.dataset.go) }});
+$("#idx").addEventListener("keydown",e=>{const a=e.target.closest("[data-go]"); if(a&&e.key==="Enter"){ tab("map"); go(+a.dataset.go) }});
+$("#q").addEventListener("input",()=>{ renderGrid(); if(!$("#view-idx").hidden) renderIdx(); if(!$("#view-co").hidden) renderCoGrid(); });
+$("#fr").addEventListener("change",()=>{ renderGrid(); if(!$("#view-idx").hidden) renderIdx(); });
+$("#fb").addEventListener("change",renderGrid); $("#fs").addEventListener("change",renderGrid);
+$("#tab-map").addEventListener("click",()=>tab("map")); $("#tab-idx").addEventListener("click",()=>tab("idx"));
+const m=location.hash.match(/^#a(\d{1,2})$/); if(m&&A.some(a=>a.id===+m[1])) cur=+m[1];
+addEventListener("hashchange",()=>{const m=location.hash.match(/^#a(\d{1,2})$/); if(m&&A.some(a=>a.id===+m[1])) go(+m[1])});
+renderGrid(); renderPanel();
+</script>
+</body>
+</html>

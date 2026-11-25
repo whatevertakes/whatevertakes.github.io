@@ -1,0 +1,8 @@
+title: 2023 Microsoft 서명키 탈취(Storm-0558)
+date: "2023"
+summary: 소비자용 서명키로 기업 메일 토큰 위조
+areas:
+  - "7"
+recent: false
+status: reported
+sources: []

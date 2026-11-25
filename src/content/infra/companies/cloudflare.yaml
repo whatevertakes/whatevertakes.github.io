@@ -1,0 +1,35 @@
+name: Cloudflare
+region: global
+order: 17
+tag: CDN·WAF·제로 트러스트
+services:
+  - name: CDN·DNS(1.1.1.1)
+    areas:
+      - "2"
+  - name: WAF·봇 관리
+    areas:
+      - "12"
+      - "2"
+  - name: Zero Trust(ZTNA)
+    areas:
+      - "2"
+      - "7"
+infra: 인터넷 트래픽 상당 부분이 지나가는 엣지 네트워크. 장애·침해 사후 분석을 상세히 공개.
+incidents:
+  - date: "2023"
+    text: Okta 침해 여파로 회전되지 않은 토큰·서비스 계정을 통해 내부 Atlassian 서버 접근
+    areas:
+      - "7"
+      - "10"
+  - date: "2025"
+    text: 봇 관리 설정 파일 이상으로 전 세계 대규모 장애 (사후 분석 공개)
+    areas:
+      - "2"
+      - "11"
+    source: https://blog.cloudflare.com/
+bounty:
+  status: yes
+  note: HackerOne에서 버그바운티 운영
+  url: https://hackerone.com/cloudflare
+tip: 블로그의 사후 분석이 네트워크·운영(2·11) 최고의 실무 교재.
+blog: https://blog.cloudflare.com/

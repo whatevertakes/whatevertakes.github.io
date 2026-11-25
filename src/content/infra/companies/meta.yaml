@@ -1,0 +1,35 @@
+name: Meta
+region: global
+order: 13
+tag: SNS·메신저·AI
+services:
+  - name: Facebook·Instagram·Threads
+    areas:
+      - "14"
+      - "7"
+  - name: WhatsApp·Messenger
+    areas:
+      - "14"
+      - "7"
+  - name: Meta AI·Llama
+    areas:
+      - "16"
+infra: 자체 데이터센터와 자체 백본. PHP 계열(Hack/HHVM), MySQL(MyRocks), React·PyTorch를 직접 만든 회사.
+incidents:
+  - date: "2021"
+    text: 백본 유지보수 명령 실수로 데이터센터 연결이 끊기고 DNS 서버가 BGP 경로를 철회 → 전 서비스 약 6시간 중단 (Meta 사후 분석)
+    areas:
+      - "2"
+      - "11"
+    source: https://engineering.fb.com/2021/10/05/networking-traffic/outage-details/
+  - date: "2018"
+    text: "'View As' 기능 결함 3개가 겹쳐 액세스 토큰 탈취"
+    areas:
+      - "7"
+      - "14"
+bounty:
+  status: yes
+  note: Meta Bug Bounty 운영(대표적인 대형 프로그램)
+  url: https://bugbounty.meta.com/
+tip: 장애 사후 분석이 공개돼 네트워크(2) 공부에 최고. 바운티는 인증·토큰(7)과 기능 간 상호작용 결함이 많음.
+blog: https://engineering.fb.com/

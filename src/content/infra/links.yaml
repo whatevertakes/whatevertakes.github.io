@@ -1,0 +1,43 @@
+# 영역 패널 "바로가기"에 쓰는 외부 DB 링크
+- id: attack
+  title: MITRE ATT&CK
+  url: https://attack.mitre.org/matrices/enterprise/
+- id: ics
+  title: ATT&CK for ICS
+  url: https://attack.mitre.org/matrices/ics/
+- id: atlas
+  title: MITRE ATLAS
+  url: https://atlas.mitre.org/
+- id: cncf
+  title: CNCF Landscape
+  url: https://landscape.cncf.io/
+- id: selfhost
+  title: awesome-selfhosted
+  url: https://awesome-selfhosted.net/
+- id: pm
+  title: post-mortems 모음
+  url: https://github.com/danluu/post-mortems
+- id: k8saf
+  title: k8s.af 장애 사례
+  url: https://k8s.af/
+- id: kev
+  title: CISA KEV
+  url: https://www.cisa.gov/known-exploited-vulnerabilities-catalog
+- id: h1
+  title: HackerOne Hacktivity
+  url: https://hackerone.com/hacktivity
+- id: boho
+  title: KISA 보호나라
+  url: https://www.boho.or.kr/
+- id: osv
+  title: OSV.dev
+  url: https://osv.dev/
+- id: eol
+  title: endoflife.date
+  url: https://endoflife.date/
+- id: owasp
+  title: OWASP Top 10
+  url: https://owasp.org/www-project-top-ten/
+- id: ghsa
+  title: GitHub Advisory DB
+  url: https://github.com/advisories

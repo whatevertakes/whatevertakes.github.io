@@ -1,0 +1,30 @@
+name: Netflix
+region: global
+order: 19
+tag: 스트리밍
+services:
+  - name: 스트리밍 서비스·앱
+    areas:
+      - "14"
+      - "7"
+  - name: Open Connect(자체 CDN 장비를 통신사에 설치)
+    areas:
+      - "2"
+      - "1"
+  - name: 콘텐츠 제작 파이프라인(외주 제작사 포함)
+    areas:
+      - "8"
+      - "15"
+infra: 자체 데이터센터에서 AWS로 전면 이전한 대표 사례. Spinnaker(배포), Chaos Monkey(장애 주입), Eureka·Zuul 등 Netflix OSS를 공개.
+incidents:
+  - date: "2017"
+    text: 외주 후반작업 업체가 해킹돼 공개 전 에피소드가 유출되고 협박당함
+    areas:
+      - "15"
+      - "8"
+bounty:
+  status: yes
+  note: Bugcrowd에서 버그바운티 운영
+  url: https://bugcrowd.com/netflix
+tip: 카오스 엔지니어링은 운영·신뢰성(11)의 원전. 협력사가 뚫리면 본사 콘텐츠가 샌다는 공급망(15) 사례.
+blog: https://netflixtechblog.com/

@@ -1,0 +1,25 @@
+name: 토스 (비바리퍼블리카)
+region: kr
+order: 4
+tag: 핀테크·은행·증권·PG
+services:
+  - name: 토스 앱(송금·인증)
+    areas:
+      - "14"
+      - "7"
+  - name: 토스뱅크·토스증권
+    areas:
+      - "14"
+      - "7"
+      - "6"
+  - name: 토스페이먼츠(PG)
+    areas:
+      - "14"
+infra: Kotlin/Spring 중심, 자체 IDC와 Kubernetes 운영 사례가 기술블로그에 공개. 금융 규제(망분리 등) 안에서 운영.
+incidents: []
+bounty:
+  status: yes
+  note: "'토스 버그바운티 챌린지' 상시 운영. 토스 앱 주요 서비스와 계열사 공식 홈페이지 대상, 건당 최대 3천만 원(보도 기준)"
+  url: https://www.techm.kr/news/articleView.html?idxno=120328
+tip: 국내에서 바운티로 실전을 쌓기 좋은 대상. 결제·인증 로직(14·7)과 금융 규제 아래의 인프라 구조를 함께 공부.
+blog: https://toss.tech/

@@ -1,0 +1,33 @@
+name: Google
+region: global
+order: 14
+tag: 검색·클라우드·모바일
+services:
+  - name: 검색·YouTube·Gmail
+    areas:
+      - "14"
+      - "7"
+  - name: Android·Chrome
+    areas:
+      - "3"
+      - "14"
+  - name: Google Cloud·Workspace
+    areas:
+      - "9"
+      - "8"
+  - name: Gemini
+    areas:
+      - "16"
+infra: Borg(Kubernetes의 원형), Spanner, BeyondCorp(제로 트러스트의 원조)를 만든 회사.
+incidents:
+  - date: "2026"
+    text: Chromium V8 등 브라우저 취약점이 CISA KEV에 다수 등재(실제 악용)
+    areas:
+      - "3"
+      - "14"
+bounty:
+  status: yes
+  note: Google VRP(Bug Hunters). 클라우드·AI·안드로이드 등 분야별 프로그램
+  url: https://bughunters.google.com/
+tip: Kubernetes(4)와 제로 트러스트(2·7)의 개념이 어디서 왔는지 원전을 볼 수 있음.
+blog: https://cloud.google.com/blog

@@ -1,0 +1,12 @@
+title: NGINX Rift (2026-05) CVE-2026-42945
+date: "2026"
+summary: rewrite 모듈 힙 오버플로. 인증 없이 작업 프로세스 중단, 조건 맞으면 RCE. 이름 없는 캡처 + 치환 문자열 '?' + 같은 블록의 rewrite·if·set 설정일 때 발동. 영향 0.6.27~1.30.0. 공개 직후 실제 악용 보도(KEV 미등재). 같은 모듈 CVE-2026-9256(poolslip)도 악용 보고
+areas:
+  - "6"
+recent: true
+status: reported
+sources:
+  - https://www.akamai.com/blog/security-research/2026/may/nginx-critical-heap-buffer-overflow-cve-2026-42945
+vulns:
+  - CVE-2026-42945
+  - CVE-2026-9256
