@@ -48,5 +48,15 @@ CVSS 점수는 CVE 공식 레코드(github.com/CVEProject/cvelistV5)에서 가�
 2. 항목마다 CVE 공식 레코드에서 CVSS 점수를 가져오고, `scripts/kev-area-rules.json` 규칙으로 영역을 정해 `vulns/`에 파일을 만듭니다(`list: recent`).
 3. 사이트 빌드가 통과하면 `kev-sync/auto` 브랜치로 PR을 엽니다. 규칙에 맞지 않는 항목은 파일을 만들지 않고 PR 설명에 "영역 분류 필요"로 남깁니다.
 
+이미 있는 항목도 함께 갱신합니다: KEV가 나중에 랜섬웨어 사용을 확인하면 `ransomware: true`로 바꾸고, CVE 레코드가 늦게 나와 비어 있던 CVSS 점수를 채웁니다.
+
 사람이 할 일: 자동 분류된 영역 확인, 영어 원문 `summary`를 한국어 한 줄 요약으로 바꾸기, 병합.
 수동 실행: Actions → KEV sync → Run workflow. 로컬 실행: `node scripts/kev-sync.mjs`.
+
+## "최근" 기준
+
+화면의 "최근 실제 악용"은 마지막 KEV 동기화 기준일(`scripts/kev-sync-state.json`)로부터 12개월 안에 등재된 `list: recent` 항목입니다. 그보다 오래된 항목은 자동으로 영역의 기본기 목록에 표시됩니다. 연도를 코드나 문구에 박지 않습니다.
+
+## 링크 검사
+
+`.github/workflows/link-check.yml`이 매주 월요일 09:41(KST)에 데이터와 페이지의 외부 링크를 열어 보고, 깨진 링크가 있으면 `link-check` 라벨 이슈를 만들거나 갱신합니다. 403·429는 봇 차단인 경우가 많아 깨진 링크로 치지 않습니다. 수동 실행: Actions → Link check → Run workflow.

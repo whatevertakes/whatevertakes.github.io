@@ -87,6 +87,30 @@ for (const v of fresh) {
   added.push({ v, area: rule.area, score });
 }
 
+// 이미 있는 항목 갱신: KEV가 나중에 바꾸는 랜섬웨어 사용 표시, 늦게 발행된 CVE 레코드의 CVSS 점수
+const kevById = new Map(kev.vulnerabilities.map((v) => [v.cveID, v]));
+const updated = [];
+for (const name of (await readdir(VULNS)).filter((f) => f.endsWith('.yaml'))) {
+  const id = name.replace(/\.yaml$/, '');
+  if (added.some((x) => x.v.cveID === id)) continue;
+  const file = join(VULNS, name);
+  let text = await readFile(file, 'utf8');
+  const before = text, notes = [];
+  const k = kevById.get(id);
+  if (k?.knownRansomwareCampaignUse === 'Known' && /ransomware:\s*false/.test(text)) {
+    text = text.replace(/ransomware:\s*false/, 'ransomware: true');
+    notes.push('랜섬웨어 사용 확인으로 변경');
+  }
+  if (!/^cvss:/m.test(text)) {
+    const score = await cvss(id);
+    if (score) {
+      text = text.replace(/\n*$/, '\n') + `cvss: { score: ${score.score}, version: ${q(score.version)}, source: "CVE 레코드(cvelistV5)" }\n`;
+      notes.push(`CVSS ${score.score} 추가`);
+    }
+  }
+  if (text !== before) { await writeFile(file, text); updated.push({ id, notes }); }
+}
+
 const newest = kev.vulnerabilities.reduce((m, v) => (v.dateAdded > m ? v.dateAdded : m), state.last_date);
 if (newest !== state.last_date) {
   state.last_date = newest;
@@ -95,7 +119,7 @@ if (newest !== state.last_date) {
 
 const row = (x) => `| ${x.v.dateAdded} | [${x.v.cveID}](https://nvd.nist.gov/vuln/detail/${x.v.cveID}) | ${x.v.vendorProject} ${x.v.product} | ${x.area} ${AREA_NAMES[x.area]} | ${x.score ? x.score.score : '없음'} | ${x.v.knownRansomwareCampaignUse === 'Known' ? '예' : ''} |`;
 const body = [
-  `CISA KEV에 ${state.last_date}까지 새로 등재된 항목을 반영합니다. 실제 악용이 확인된 취약점입니다.`,
+  `CISA KEV에 ${state.last_date}까지 새로 등재된 항목을 반영하고, 이미 있는 항목의 랜섬웨어 표시와 빠진 CVSS 점수를 갱신합니다.`,
   '',
   `## 추가 (${added.length}건)`,
   '',
@@ -104,6 +128,10 @@ const body = [
   `## 영역 분류 필요 (${unmapped.length}건)`,
   '',
   unmapped.length ? '자동 분류 규칙에 맞지 않아 파일을 만들지 않았습니다. 필요하면 직접 추가하거나 `scripts/kev-area-rules.json`에 규칙을 더해 주세요.\n\n' + unmapped.map((v) => `- ${v.dateAdded} [${v.cveID}](https://nvd.nist.gov/vuln/detail/${v.cveID}) ${v.vendorProject} ${v.product}: ${v.vulnerabilityName}`).join('\n') : '없음',
+  '',
+  `## 기존 항목 갱신 (${updated.length}건)`,
+  '',
+  updated.length ? updated.map((u) => `- [${u.id}](https://nvd.nist.gov/vuln/detail/${u.id}): ${u.notes.join(', ')}`).join('\n') : '없음',
   '',
   '## 검토할 것',
   '',
@@ -115,5 +143,5 @@ const body = [
 ].join('\n');
 await writeFile(PR_BODY, body + '\n');
 
-if (process.env.GITHUB_OUTPUT) await writeFile(process.env.GITHUB_OUTPUT, `added=${added.length}\nunmapped=${unmapped.length}\nlast_date=${state.last_date}\n`, { flag: 'a' });
-console.log(`KEV 동기화: 추가 ${added.length}, 분류 필요 ${unmapped.length}, 기준일 ${state.last_date}`);
+if (process.env.GITHUB_OUTPUT) await writeFile(process.env.GITHUB_OUTPUT, `added=${added.length}\nupdated=${updated.length}\nchanged=${added.length + updated.length}\nunmapped=${unmapped.length}\nlast_date=${state.last_date}\n`, { flag: 'a' });
+console.log(`KEV 동기화: 추가 ${added.length}, 갱신 ${updated.length}, 분류 필요 ${unmapped.length}, 기준일 ${state.last_date}`);
