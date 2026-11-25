@@ -117,31 +117,62 @@ if (newest !== state.last_date) {
   await writeFile(STATE, JSON.stringify(state, null, 2) + '\n');
 }
 
-const row = (x) => `| ${x.v.dateAdded} | [${x.v.cveID}](https://nvd.nist.gov/vuln/detail/${x.v.cveID}) | ${x.v.vendorProject} ${x.v.product} | ${x.area} ${AREA_NAMES[x.area]} | ${x.score ? x.score.score : '없음'} | ${x.v.knownRansomwareCampaignUse === 'Known' ? '예' : ''} |`;
-const body = [
-  `CISA KEV에 ${state.last_date}까지 새로 등재된 항목을 반영하고, 이미 있는 항목의 랜섬웨어 표시와 빠진 CVSS 점수를 갱신합니다.`,
+// PR 설명: 맨 위에 사람이 할 일 체크리스트, 항목마다 바로 고치는 링크
+const REPO = process.env.GITHUB_REPOSITORY ?? 'whatevertakes/whatevertakes.github.io';
+const BRANCH = process.env.SYNC_BRANCH ?? 'kev-sync/auto';
+const editUrl = (id) => `https://github.com/${REPO}/edit/${BRANCH}/src/content/infra/vulns/${id}.yaml`;
+const newUrl = (v) => `https://github.com/${REPO}/new/${BRANCH}/src/content/infra/vulns?filename=${v.cveID}.yaml&value=${encodeURIComponent(toYaml(v, '?', null))}`;
+const nvd = (id) => `[${id}](https://nvd.nist.gov/vuln/detail/${id})`;
+const row = (x) => `| ${x.v.dateAdded} | ${nvd(x.v.cveID)} | ${x.v.vendorProject} ${x.v.product} | **${x.area}** ${AREA_NAMES[x.area]} | ${x.score ? x.score.score : '없음'} | ${x.v.knownRansomwareCampaignUse === 'Known' ? '예' : ''} | ${x.v.vulnerabilityName} | [고치기](${editUrl(x.v.cveID)}) |`;
+const minutes = Math.max(2, added.length + unmapped.length * 2);
+const todo = [
+  `## 사람이 할 일 (약 ${minutes}분)`,
   '',
+  '> 이 PR의 브랜치는 다음 날 동기화 때 새로 덮어써집니다. **고친 내용은 그날 바로 병합**해 주세요.',
+  '',
+];
+if (added.length) todo.push(
+  `- [ ] **1. 영역 확인** — 아래 「추가」 표의 **자동 분류 영역**이 제품과 맞는지 봅니다. 틀리면 그 줄의 **고치기**를 눌러 \`areas: ["6"]\`의 숫자를 바꾸고 *Commit changes*를 누릅니다. (번호표는 맨 아래)`,
+  `- [ ] **2. 한국어 요약** — 각 줄의 **고치기**에서 \`summary:\`의 영어 원문을 한국어 한 줄로 바꿉니다. 이 문장이 지도 화면에 그대로 보입니다.`,
+  '  - 예: `"Apache ActiveMQ Improper Input Validation Vulnerability"` → `"Apache ActiveMQ 입력 검증 결함으로 코드 실행"`',
+  '  - 무엇이 문제이고(코드 실행, 인증 우회, 경로 조작 등) 어떤 제품인지만 짧게. 공격 방법은 쓰지 않습니다.',
+);
+if (unmapped.length) todo.push(
+  `- [ ] **3. 분류 필요 ${unmapped.length}건** — 지도에 넣을 항목만 처리합니다. 「영역 분류 필요」의 **새 파일 만들기**를 누르면 내용이 채워진 파일이 열립니다. \`areas: ["?"]\`의 \`?\`를 영역 번호로 바꾸고, 요약을 한국어로 바꾼 뒤 *Commit changes*. 넣지 않을 항목은 건너뜁니다.`,
+  '  - 자주 나오는 제품이면 `scripts/kev-area-rules.json`에 규칙을 더하면 다음부터 자동 분류됩니다.',
+);
+todo.push(
+  `- [ ] **${unmapped.length ? 4 : added.length ? 3 : 1}. 병합** — 고친 뒤 빌드 검사(✅)가 통과하면 *Merge*를 누릅니다. 병합하면 사이트 지도에 자동 반영됩니다(영역 타일 숫자, 최근 실제 악용 상자, 색인, 위험도 필터).`,
+  '',
+  '이 PR은 만들어지기 전에 사이트 빌드(스키마·참조 검사)를 통과했습니다. 고친 뒤 빌드가 실패하면 PR 아래 검사 로그에 문제 파일이 나옵니다.',
+  '',
+);
+const body = [
+  ...todo,
   `## 추가 (${added.length}건)`,
   '',
-  added.length ? '| KEV 등재일 | CVE | 제품 | 자동 분류 영역 | CVSS | 랜섬웨어 |\n|---|---|---|---|---|---|\n' + added.map(row).join('\n') : '없음',
+  added.length ? '| KEV 등재일 | CVE | 제품 | 자동 분류 영역 | CVSS | 랜섬웨어 | KEV 원문(요약 참고) | |\n|---|---|---|---|---|---|---|---|\n' + added.map(row).join('\n') : '없음',
   '',
   `## 영역 분류 필요 (${unmapped.length}건)`,
   '',
-  unmapped.length ? '자동 분류 규칙에 맞지 않아 파일을 만들지 않았습니다. 필요하면 직접 추가하거나 `scripts/kev-area-rules.json`에 규칙을 더해 주세요.\n\n' + unmapped.map((v) => `- ${v.dateAdded} [${v.cveID}](https://nvd.nist.gov/vuln/detail/${v.cveID}) ${v.vendorProject} ${v.product}: ${v.vulnerabilityName}`).join('\n') : '없음',
+  unmapped.length ? unmapped.map((v) => `- ${v.dateAdded} ${nvd(v.cveID)} ${v.vendorProject} ${v.product}: ${v.vulnerabilityName} — [새 파일 만들기](${newUrl(v)})`).join('\n') : '없음',
   '',
-  `## 기존 항목 갱신 (${updated.length}건)`,
+  `## 기존 항목 자동 갱신 (${updated.length}건, 확인만)`,
   '',
-  updated.length ? updated.map((u) => `- [${u.id}](https://nvd.nist.gov/vuln/detail/${u.id}): ${u.notes.join(', ')}`).join('\n') : '없음',
+  updated.length ? updated.map((u) => `- ${nvd(u.id)}: ${u.notes.join(', ')}`).join('\n') : '없음',
   '',
-  '## 검토할 것',
+  '<details><summary>영역 번호표</summary>',
   '',
-  '- 자동 분류된 영역이 맞는지 확인합니다.',
-  '- `summary`는 KEV 영어 원문입니다. 한국어 한 줄 요약으로 바꿔 주세요.',
-  '- 이 PR은 워크플로 안에서 사이트 빌드(스키마·참조 검사)를 통과한 뒤 열렸습니다.',
+  Object.entries(AREA_NAMES).map(([k, v]) => `${k} ${v}`).join(' · '),
+  '',
+  '</details>',
   '',
   '출처: [CISA KEV](https://www.cisa.gov/known-exploited-vulnerabilities-catalog) (미러: github.com/cisagov/kev-data), CVSS: github.com/CVEProject/cvelistV5',
 ].join('\n');
-await writeFile(PR_BODY, body + '\n');
+// GitHub PR 본문 한도(65,536자)를 넘지 않게 자른다. 파일과 링크는 PR의 Files changed에 그대로 있다.
+const LIMIT = 60000;
+const finalBody = body.length > LIMIT ? body.slice(0, LIMIT) + '\n\n…(본문이 길어 잘렸습니다. 나머지는 Files changed 탭에서 확인하세요.)' : body;
+await writeFile(PR_BODY, finalBody + '\n');
 
 if (process.env.GITHUB_OUTPUT) await writeFile(process.env.GITHUB_OUTPUT, `added=${added.length}\nupdated=${updated.length}\nchanged=${added.length + updated.length}\nunmapped=${unmapped.length}\nlast_date=${state.last_date}\n`, { flag: 'a' });
 console.log(`KEV 동기화: 추가 ${added.length}, 갱신 ${updated.length}, 분류 필요 ${unmapped.length}, 기준일 ${state.last_date}`);
