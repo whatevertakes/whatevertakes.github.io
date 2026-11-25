@@ -1,0 +1,61 @@
+{
+  "_설명": "KEV 항목을 인프라 영역에 자동 분류하는 규칙. 위에서부터 차례로 검사하고 처음 맞는 규칙을 쓴다. match는 'vendor product vulnerabilityName'을 소문자로 합친 문자열에 대한 정규식. 맞는 규칙이 없으면 파일을 만들지 않고 PR 설명에 '분류 필요'로 남긴다.",
+  "rules": [
+    {
+      "area": "15",
+      "match": "embedded malicious code|without integrity check|malicious version"
+    },
+    {
+      "area": "16",
+      "match": "langflow|litellm|\\bn8n\\b|marimo|ray-project|\\bmlflow|gpustack|monai|ollama|vllm|langchain"
+    },
+    {
+      "area": "10",
+      "match": "gitlab|jenkins|teamcity|\\bgitea\\b|\\bgogs\\b|artifactory|puppet|ansible|terraform|argo cd|bamboo|tj-actions"
+    },
+    {
+      "area": "11",
+      "match": "splunk|grafana|kibana|zabbix|metabase|solarwinds|prometheus|nagios"
+    },
+    {
+      "area": "12",
+      "match": "defender|trend micro|crowdstrike|forticlient|fortisandbox|firewall management center|smartconsole|email security gateway|secure email gateway|apex one|sentinelone|endpoint security|barracuda"
+    },
+    {
+      "area": "7",
+      "match": "active directory|federation services|\\bentra\\b|\\bokta\\b|keycloak|identity services engine|\\bsso\\b|single sign-on|kerberos|netlogon"
+    },
+    {
+      "area": "8",
+      "match": "exchange|sharepoint|outlook|microsoft office|\\bzimbra|smartermail|roundcube|moveit|screenconnect|beyondtrust|n-able|kaseya|simplehelp|endpoint manager|papercut|confluence|\\bjira\\b|atlassian|kace|webhelpdesk|web help desk|filezen|aspera|zammad|collabora|crushftp|wing ftp|serv-u|proftpd|onlyoffice"
+    },
+    {
+      "area": "4",
+      "match": "vmware|esxi|vcenter|\\bdocker\\b|kubernetes|\\brunc\\b|containerd|proxmox|hyper-v|citrix hypervisor|oneview"
+    },
+    {
+      "area": "5",
+      "match": "veeam|acronis|commvault|ahsay|recoverpoint|\\bqnap\\b|synology|\\bminio\\b|samba|backup"
+    },
+    {
+      "area": "6",
+      "match": "tomcat|activemq|weblogic|oracle http server|jboss|wildfly|kafka|\\bredis\\b|elasticsearch|apache axis|apache http server|\\bnginx\\b|brotli|\\bopenssl\\b"
+    },
+    {
+      "area": "14",
+      "match": "wordpress|drupal|joomla|magento|adobe commerce|laravel|craft cms|\\bphp\\b|ruby on rails|\\brails\\b|spring|struts|coldfusion|starlette|django|\\bvite\\b|react native|kentico|roller|redcap|optimizely|anticsrf|peoplesoft|e-business suite|netweaver|windchill|page builder|icagenda|balbooa|mirasvit|strapi"
+    },
+    {
+      "area": "13",
+      "match": "d-link|tp-link|hikvision|dahua|ubiquiti|unifi|lantronix|siemens|schneider|rockwell|qualcomm|freeswitch|broadworks|asterisk|freepbx|switchvox|unrealircd|\\bplex\\b|pixel|android|openwave"
+    },
+    {
+      "area": "2",
+      "match": "fortios|fortigate|fortiproxy|fortiweb|fortimail|fortinet|pan-os|palo alto|netscaler|citrix|connect secure|ivanti sentry|sonicwall|sonicos|big-ip|\\bf5\\b|juniper|mikrotik|routeros|zyxel|arista|velocloud|check point|sd-wan|cisco asa|adaptive security|expressway|unified communications|loadmaster|openvpn|haproxy|\\bversa\\b|siteguard|firewall asa|secure ftd|\\bbind\\b|isc bind"
+    },
+    {
+      "area": "3",
+      "match": "windows|linux kernel|openssh|inetutils|macos|\\bapple\\b|chromium|chrome|firefox|safari|\\bskia\\b|\\bdawn\\b|v8|acrobat|daemon tools|trueconf|\\bsudo\\b|polkit"
+    }
+  ]
+}

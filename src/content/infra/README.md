@@ -39,3 +39,14 @@ cvss: { score: 9.8, version: "3.1", source: CVE 레코드(cvelistV5) }
 ```
 
 CVSS 점수는 CVE 공식 레코드(github.com/CVEProject/cvelistV5)에서 가져오고, 3.1 → 3.0 → 4.0 순으로 고릅니다.
+
+## KEV 자동 동기화
+
+`.github/workflows/kev-sync.yml`이 매일 07:17(KST)에 돕니다.
+
+1. CISA KEV 최신본(github.com/cisagov/kev-data 미러)에서 `scripts/kev-sync-state.json`의 기준일 이후 새로 등재된 항목을 찾습니다.
+2. 항목마다 CVE 공식 레코드에서 CVSS 점수를 가져오고, `scripts/kev-area-rules.json` 규칙으로 영역을 정해 `vulns/`에 파일을 만듭니다(`list: recent`).
+3. 사이트 빌드가 통과하면 `kev-sync/auto` 브랜치로 PR을 엽니다. 규칙에 맞지 않는 항목은 파일을 만들지 않고 PR 설명에 "영역 분류 필요"로 남깁니다.
+
+사람이 할 일: 자동 분류된 영역 확인, 영어 원문 `summary`를 한국어 한 줄 요약으로 바꾸기, 병합.
+수동 실행: Actions → KEV sync → Run workflow. 로컬 실행: `node scripts/kev-sync.mjs`.
