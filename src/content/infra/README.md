@@ -1,6 +1,6 @@
 # WT 인프라 지도 데이터
 
-`/ko/infra-map/` 페이지가 이 폴더의 YAML을 읽어 만들어집니다. 화면 코드는 `src/pages/ko/infra-map/index.astro`, 스키마는 `src/content.config.ts`, 참조 검사와 변환은 `src/lib/infra-data.ts`에 있습니다.
+`/ko/research/infra-map/` 페이지가 이 폴더의 YAML을 읽어 만들어집니다. 화면 코드는 `src/pages/ko/research/infra-map/index.astro`, 스키마는 `src/content.config.ts`, 참조 검사와 변환은 `src/lib/infra-data.ts`에 있습니다.
 
 ## 공개 규칙
 
