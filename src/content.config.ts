@@ -82,7 +82,10 @@ const companies = defineCollection({
         summary: z.string(),
         facts: z.array(z.object({ label: z.string(), value: z.string(), detail: z.string() })),
         services: z.array(z.object({ name: z.string(), areas: z.record(areaId, z.enum(['core', 'related'])) })),
-        areas: z.record(areaId, z.object({ here: z.string(), risk: z.string(), study: z.string(), sources: z.array(z.object({ title: z.string(), url: z.string().url() })) })),
+        // level: 이 회사에서 이 영역의 보안상 중요도 (hi: 핵심 공격 표면이거나 실제 사건이 있음)
+        areas: z.record(areaId, z.object({ level: z.enum(['hi', 'mid', 'lo']).optional(), here: z.string(), risk: z.string(), study: z.string(), sources: z.array(z.object({ title: z.string(), url: z.string().url() })) })),
+        // 사건이 영역을 따라 번진 경로. 실제 사건이 없으면 제목에 "가상 시나리오"를 밝힌다
+        paths: z.array(z.object({ title: z.string(), steps: z.array(z.object({ area: areaId, label: z.string() })).min(2), source: z.string().url().optional() })).optional(),
         timeline: z.array(z.object({ date: year, text: z.string(), bad: z.boolean().optional() })),
         use: z.array(z.object({ title: z.string(), style: z.enum(['ul', 'ol']), items: z.array(z.string()), note: z.string() })),
       })

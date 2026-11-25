@@ -18,6 +18,7 @@ const c = data.counts;
       <button role="tab" id="tab-map" aria-selected="true">영역 지도</button>
       <button role="tab" id="tab-idx" aria-selected="false">사건·CVE 색인</button>
       <button role="tab" id="tab-co" aria-selected="false">기업</button>
+      <button role="tab" id="tab-dp" aria-selected="false">기업 해부</button>
     </div>
   </header>
 
@@ -44,11 +45,23 @@ const c = data.counts;
     </div>
   </section>
 
+  <section id="view-dp" hidden>
+    <div class="legend"><span>인프라 16개 영역 전부로 해부한 기업입니다. 카드를 누르면 해부가 열립니다</span></div>
+    <div class="dp-list" id="dp-list"></div>
+    <h3 class="dp-h2">두 기업 영역별 비교</h3>
+    <div class="cmp-pick"><select id="cmp-a" aria-label="비교할 기업 1"></select><span class="num">vs</span><select id="cmp-b" aria-label="비교할 기업 2"></select></div>
+    <div class="tblwrap"><table class="cmp" id="cmp"></table></div>
+  </section>
+
   <section id="view-deep" hidden>
-    <div class="dp-top"><button class="dp-back" id="dp-back">← 기업 목록</button><span class="num">기업 해부 · 16개 영역</span></div>
+    <div class="dp-top"><button class="dp-back" id="dp-back">← 기업 해부 목록</button><span class="num">기업 해부 · 16개 영역</span></div>
     <h2 class="dp-h1" id="dp-title"></h2><h2 id="dp-name" style="margin:12px 0 4px"></h2>
     <p class="sub" id="dp-sub"></p>
     <div class="dp-facts" id="dp-facts"></div>
+    <h3 class="dp-h2">영역별 위험도</h3>
+    <div class="lv-strip" id="dp-lv"></div>
+    <div class="legend" style="margin-top:6px"><span><span class="pill b-hi">높음</span> 핵심 공격 표면이거나 실제 사건이 있음</span><span><span class="pill b-mid">중간</span></span><span><span class="pill b-lo">낮음</span></span><span>칸을 누르면 해당 영역 카드로 이동합니다</span></div>
+    <div id="dp-paths-wrap"><h3 class="dp-h2">사건 확산 경로</h3><div class="paths" id="dp-paths"></div></div>
     <h3 class="dp-h2">서비스 × 16개 영역</h3>
     <div class="tblwrap"><table class="mx" id="dp-mx"></table></div>
     <div class="legend" style="margin-top:8px"><span><span class="dot d2"></span>핵심 의존</span><span><span class="dot d1"></span>관련</span><span>영역 번호를 누르면 아래 카드로 이동합니다. 연결은 공개 자료 기반 분석입니다</span></div>
@@ -176,11 +189,14 @@ function renderDeep(id,areaId){
   $("#dp-title").textContent=c.name+" 인프라 해부"; document.getElementById("dp-name").textContent=c.name+" 인프라 해부";
   $("#dp-sub").textContent=d.sub;
   $("#dp-facts").innerHTML=d.facts.map(f=>`<div class="dp-fact"><div class="k">${f[0]}</div><div class="v">${esc(f[1])}</div><div class="d">${esc(f[2])}</div></div>`).join("");
+  $("#dp-lv").innerHTML=A.map(a=>{const x=d.cards[a.id];const lv=x&&x[4];return `<button class="lv lv-${lv||"none"}" data-scroll="${a.id}" title="${a.name}${lv?": "+LV[lv][0]:""}"><span class="num">${String(a.id).padStart(2,"0")}</span><span class="nm">${a.name}</span></button>`}).join("");
+  $("#dp-paths-wrap").hidden=!(d.paths&&d.paths.length);
+  $("#dp-paths").innerHTML=(d.paths||[]).map(p=>`<div class="path"><div class="pt">${esc(p[0])}${p[2]?` <a class="cve" href="${p[2]}" target="_blank" rel="noopener">출처 ↗</a>`:""}</div><div class="steps">${p[1].map((st,i)=>`${i?'<span class="arr" aria-hidden="true">→</span>':""}<button class="step" data-scroll="${st[0]}"><span class="num">${String(st[0]).padStart(2,"0")} ${A.find(a=>a.id===+st[0]).name}</span><span>${esc(st[1])}</span></button>`).join("")}</div></div>`).join("");
   $("#dp-mx").innerHTML=`<thead><tr><th>서비스</th>${A.map(a=>`<th><button data-scroll="${a.id}">${String(a.id).padStart(2,"0")}<span>${a.name}</span></button></th>`).join("")}</tr></thead><tbody>`+
     d.svc.map(s=>`<tr><td>${esc(s[0])}</td>${A.map(a=>{const v=s[1][a.id];return `<td>${v?`<span class="dot d${v}" title="${esc(s[0])} · ${a.name}: ${v===2?"핵심 의존":"관련"}"></span>`:""}</td>`}).join("")}</tr>`).join("")+`</tbody>`;
   $("#dp-areas").innerHTML=A.map(a=>{const x=d.cards[a.id]; if(!x) return ""; const used=d.svc.filter(s=>s[1][a.id]===2).map(s=>s[0]); return `
     <div class="dp-card" id="dp-area-${a.id}">
-      <div class="hd"><h4>${a.name}</h4><span class="num">${String(a.id).padStart(2,"0")}</span></div>
+      <div class="hd"><h4>${a.name}</h4><span>${x[4]?`<span class="pill ${LV[x[4]][1]}">${LV[x[4]][0]}</span> `:""}<span class="num">${String(a.id).padStart(2,"0")}</span></span></div>
       ${used.length?`<div class="dp-row"><div class="lab">핵심 의존 서비스</div><p>${esc(used.join(", "))}</p></div>`:""}
       <div class="dp-row"><div class="lab">${esc(c.name)}에서는</div><p>${esc(x[0])}</p></div>
       <div class="dp-row dp-risk"><div class="lab">보안 관점</div><p>${esc(x[1])}</p></div>
@@ -197,13 +213,39 @@ $("#view-deep").addEventListener("click",e=>{
   const s=e.target.closest("[data-scroll]"); if(s){ scrollToCard(+s.dataset.scroll); return; }
   const g=e.target.closest("[data-go]"); if(g){ tab("map"); go(+g.dataset.go); scrollTo(0,0); }
 });
-$("#dp-back").addEventListener("click",()=>tab("co"));
-document.addEventListener("click",e=>{const b=e.target.closest("[data-deep]"); if(b){ if(b.dataset.deep!==coCur) coCur=b.dataset.deep; renderDeep(b.dataset.deep, b.dataset.area?+b.dataset.area:0); }});
+const LV={hi:["높음","b-hi"],mid:["중간","b-mid"],lo:["낮음","b-lo"]};
+let deepFrom="dp";
+$("#dp-back").addEventListener("click",()=>tab(deepFrom));
+document.addEventListener("click",e=>{const b=e.target.closest("[data-deep]"); if(b){ deepFrom=["map","co","dp"].find(k=>!$("#view-"+k).hidden)||"dp"; $("#dp-back").textContent=deepFrom==="co"?"← 기업 목록":deepFrom==="map"?"← 영역 지도":"← 기업 해부 목록"; if(b.dataset.deep!==coCur) coCur=b.dataset.deep; renderDeep(b.dataset.deep, b.dataset.area?+b.dataset.area:0); }});
+const deepIds=()=>CO.filter(c=>DEEP[c.id]).map(c=>c.id);
+function lvCount(d,l){ return Object.values(d.cards).filter(x=>x[4]===l).length }
+function renderDpList(){
+  $("#dp-list").innerHTML=deepIds().map(id=>{const c=CO.find(x=>x.id===id),d=DEEP[id];return `<button class="dp-item" data-deep="${id}">
+    <div class="im-top"><span class="num">${c.kr?"국내":"해외"} · ${esc(c.tag)}</span>${c.bb[0]==="y"?`<span class="pill s-done">바운티</span>`:""}</div>
+    <h3>${esc(c.name)}</h3>
+    <ul>${d.facts.map(f=>`<li><span class="num">${esc(f[0])}</span> ${esc(f[1])}</li>`).join("")}</ul>
+    <div class="mini">${A.map(a=>{const x=d.cards[a.id];return `<i class="lv-${(x&&x[4])||"none"}" title="${a.name}"></i>`}).join("")}</div>
+    <span class="new26">위험도 높음 ${lvCount(d,"hi")}개 영역${d.paths&&d.paths.length?` · 확산 경로 ${d.paths.length}`:""}</span>
+  </button>`}).join("");
+  const ids=deepIds(), opt=sel=>ids.map(id=>`<option value="${id}"${id===sel?" selected":""}>${esc(CO.find(c=>c.id===id).name)}</option>`).join("");
+  const a=$("#cmp-a").value||ids[0], b=$("#cmp-b").value||ids[1]||ids[0];
+  $("#cmp-a").innerHTML=opt(a); $("#cmp-b").innerHTML=opt(b); renderCmp();
+}
+function renderCmp(){
+  const ia=$("#cmp-a").value, ib=$("#cmp-b").value, da=DEEP[ia], db=DEEP[ib];
+  const ca=CO.find(c=>c.id===ia), cb=CO.find(c=>c.id===ib);
+  const cell=(d,a)=>{const x=d.cards[a.id]; if(!x) return "<td></td>"; const core=d.svc.filter(s=>s[1][a.id]===2).length; return `<td>${x[4]?`<span class="pill ${LV[x[4]][1]}">${LV[x[4]][0]}</span> `:""}<span class="num">핵심 서비스 ${core}</span><p>${esc(x[0])}</p></td>`};
+  $("#cmp").innerHTML=`<thead><tr><th>영역</th><th><button class="linkbtn" data-deep="${ia}">${esc(ca.name)} →</button></th><th><button class="linkbtn" data-deep="${ib}">${esc(cb.name)} →</button></th></tr></thead><tbody>`+
+    A.map(a=>`<tr><td><span class="num">${String(a.id).padStart(2,"0")}</span><br>${a.name}</td>${cell(da,a)}${cell(db,a)}</tr>`).join("")+`</tbody>`;
+}
+$("#cmp-a").addEventListener("change",renderCmp); $("#cmp-b").addEventListener("change",renderCmp);
+$("#tab-dp").addEventListener("click",()=>tab("dp"));
 function tab(which){
   const map=which==="map";
-  ["map","idx","co","deep"].forEach(k=>{ $("#view-"+k).hidden=k!==which; const t=$("#tab-"+k); if(t) t.setAttribute("aria-selected",k===which||(k==="co"&&which==="deep")) });
-  $("#fb").hidden=!map; $("#fs").hidden=!map; $("#fr").hidden=which==="co"||which==="deep";
-  $("#q").hidden=which==="deep";
+  ["map","idx","co","dp","deep"].forEach(k=>{ $("#view-"+k).hidden=k!==which; const t=$("#tab-"+k); if(t) t.setAttribute("aria-selected",k===which||(k==="dp"&&which==="deep")) });
+  $("#fb").hidden=!map; $("#fs").hidden=!map; $("#fr").hidden=which==="co"||which==="deep"||which==="dp";
+  $("#q").hidden=which==="deep"||which==="dp";
+  if(which==="dp") renderDpList();
   if(which==="idx") renderIdx(); if(which==="co"){ renderCoGrid(); renderCoPanel(); }
 }
 $("#tab-co").addEventListener("click",()=>tab("co"));
@@ -234,6 +276,16 @@ renderGrid(); renderPanel();
   color:var(--fg); font-family:var(--sans); font-size:15px; line-height:1.55;
 }
 .im [hidden]{display:none!important}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .im{--bg:#f6f8f7; --surface:#ffffff; --line:#d3ddd9; --fg:#14201d; --muted:#4f625b;
+  --accent:#1d7a52; --accent-soft:rgba(29,122,82,.10);
+  --info:#2f5fd0; --info-soft:rgba(47,95,208,.10);
+  --hi:#b3261e; --hi-soft:#fbe9e7; --mid:#8a5a00; --mid-soft:#fdf3dc; --lo:#4b5563; --lo-soft:#eceef2;
+  --done:#1d7a52; --done-soft:rgba(29,122,82,.12);}}
+:root[data-theme="light"] .im{--bg:#f6f8f7; --surface:#ffffff; --line:#d3ddd9; --fg:#14201d; --muted:#4f625b;
+  --accent:#1d7a52; --accent-soft:rgba(29,122,82,.10);
+  --info:#2f5fd0; --info-soft:rgba(47,95,208,.10);
+  --hi:#b3261e; --hi-soft:#fbe9e7; --mid:#8a5a00; --mid-soft:#fdf3dc; --lo:#4b5563; --lo-soft:#eceef2;
+  --done:#1d7a52; --done-soft:rgba(29,122,82,.12);}
 .im header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:16px}
 .im .tabs{display:flex;gap:4px;background:var(--lo-soft);padding:4px;border-radius:8px}
 .im .tabs button{border:0;background:transparent;color:var(--muted);font:500 .9rem var(--sans);padding:6px 12px;border-radius:6px;cursor:pointer}
@@ -344,5 +396,32 @@ renderGrid(); renderPanel();
 
 .im .mx thead th button{display:flex;flex-direction:column-reverse;align-items:center;gap:4px;margin:0 auto}
 .im .mx thead th span{height:9.5em;max-height:none;margin:0}
+.im .dp-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:8px}
+.im .dp-item{display:flex;flex-direction:column;gap:8px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;color:var(--fg);font:inherit;cursor:pointer;min-width:0}
+.im .dp-item:hover{border-color:var(--accent)}
+.im .dp-item h3{margin:0;font-size:1.1rem}
+.im .dp-item ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;font-size:.86rem}
+.im .dp-item .im-top{display:flex;justify-content:space-between;gap:6px;align-items:center}
+.im .mini{display:grid;grid-template-columns:repeat(16,1fr);gap:2px}
+.im .mini i{display:block;height:8px;border-radius:2px;background:var(--lo-soft)}
+.im .lv-hi{background:var(--hi-soft);border-color:var(--hi)} .im .lv-mid{background:var(--mid-soft);border-color:var(--mid)} .im .lv-lo{background:var(--lo-soft);border-color:var(--line)}
+.im .mini i.lv-hi{background:var(--hi)} .im .mini i.lv-mid{background:var(--mid)}
+.im .lv-strip{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px}
+@media (max-width:700px){.im .lv-strip{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.im .lv{display:flex;flex-direction:column;gap:2px;align-items:flex-start;text-align:left;border:1px solid var(--line);border-radius:8px;padding:6px 8px;color:var(--fg);font:inherit;font-size:.8rem;cursor:pointer;min-width:0;background:var(--surface)}
+.im .lv .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.im .lv:hover{outline:1px solid var(--accent)}
+.im .lv.lv-hi{background:var(--hi-soft);border-color:var(--hi)} .im .lv.lv-mid{background:var(--mid-soft);border-color:var(--mid)} .im .lv.lv-lo{background:var(--surface);border-color:var(--line)} .im .lv.lv-none{opacity:.5}
+.im .paths{display:flex;flex-direction:column;gap:12px}
+.im .path{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.im .path .pt{font-weight:700;margin-bottom:8px}
+.im .steps{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.im .step{display:flex;flex-direction:column;gap:2px;text-align:left;border:1px solid var(--hi);background:var(--hi-soft);color:var(--fg);border-radius:8px;padding:6px 10px;font:inherit;font-size:.86rem;cursor:pointer;max-width:240px}
+.im .arr{color:var(--muted)}
+.im .cmp-pick{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.im table.cmp{min-width:640px}
+.im .cmp td{vertical-align:top}
+.im .cmp td p{margin:4px 0 0;font-size:.86rem;color:var(--fg);display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.im .cmp td:first-child{white-space:nowrap}
 .im .im-head{display:flex;justify-content:flex-end;margin:28px 0 16px}
 </style>

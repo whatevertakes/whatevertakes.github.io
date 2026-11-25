@@ -144,6 +144,7 @@ deep:
         "13": core
   areas:
     "1":
+      level: mid
       here: 자체 데이터센터 각 춘천(2013)과 각 세종(2023 가동). 각 세종은 GPU를 매년 수만 장씩 늘리는 AI 클러스터로 소개됨. 2026-06 엔비디아와 각 세종 약 4배 규모 AI 팩토리 계획 발표(전력 확보 조건).
       risk: 화재·전원 같은 물리 사고가 곧 전 서비스 장애. 카카오 판교 화재(2022), 국가정보자원관리원 화재(2025) 이후 대형 플랫폼의 이중화·재난관리 책임이 커짐. BMC 같은 서버 관리망은 별도 보호 대상.
       study: 데이터센터 이중화(Active-Active), UPS·배터리 배치, 대형 사업자 재난관리 규제.
@@ -153,6 +154,7 @@ deep:
         - title: 각 세종 오픈
           url: https://byline.network/2023/11/1108-3/
     "2":
+      level: mid
       here: 국내 최대급 웹 트래픽에 웹툰(글로벌), 치지직 라이브 스트리밍까지. 사옥 1784에는 이음5G(5G 특화망)를 국내 처음 상용화.
       risk: 대규모 DDoS, 프록시·CDN 계층의 요청 처리 결함, 스트리밍 트래픽 급증. 2026년 nginx HTTP/2·HTTP/3 취약점(nginx2root)처럼 웹 서버 계층 결함은 전 서비스에 바로 영향.
       study: CDN 구조, L4/L7 로드밸런서, HTTP/2·HTTP/3, 라이브 스트리밍 프로토콜.
@@ -160,21 +162,25 @@ deep:
         - title: 삼성전자-네이버클라우드 이음5G
           url: https://byline.network/2022/06/2-129/
     "3":
+      level: mid
       here: 서버는 대량의 Linux. 단말 쪽으로는 네이버 앱과 Chromium 기반 웨일 브라우저를 직접 배포.
       risk: 웨일은 Chromium 상위 패치를 따라가야 한다. 2026년 KEV에는 Chromium V8 등 실제 악용 취약점이 여러 건 올라 있어 패치 반영 속도가 곧 사용자 위험.
       study: Chromium 파생 브라우저의 패치 주기, Linux 서버 하드닝.
       sources: []
     "4":
+      level: mid
       here: NCP는 Kubernetes 관리형 서비스(NKS)를 판매. 사내 서비스도 컨테이너 플랫폼 이전 사례가 기술블로그에 공개.
       risk: 클라우드 사업자는 여러 고객이 같은 하드웨어를 쓰는 멀티 테넌트. 컨테이너·하이퍼바이저 격리가 깨지면 고객 간 경계가 무너짐.
       study: Kubernetes RBAC, 멀티 테넌트 격리, 컨테이너 탈출 N-day(runc 등).
       sources: []
     "5":
+      level: mid
       here: MYBOX(개인 클라우드 저장소), 블로그·카페·웹툰의 대용량 이미지, NCP Object Storage(S3 호환).
       risk: 공개 링크·버킷 권한 설정 실수, 백업 분리. 개인 파일 저장소는 계정 탈취 시 피해가 큼.
       study: S3 호환 스토리지 권한 모델, 서명 URL, 백업 분리.
       sources: []
     "6":
+      level: mid
       here: Java/Spring 중심. 네이버가 만든 오픈소스로 ARCUS(memcached 기반 캐시 클러스터), nBase-ARC(Redis 기반 클러스터)가 공개돼 있고, CUBRID는 NHN 시절 개발된 DB.
       risk: 캐시·DB 관리 포트 노출, 역직렬화, 프레임워크 N-day(Spring4Shell, Log4Shell 등)가 Java 생태계 공통 위험.
       study: ARCUS·nBase-ARC를 직접 설치해 보기, Spring 보안 N-day 해부.
@@ -184,6 +190,7 @@ deep:
         - title: nBase-ARC (GitHub)
           url: https://github.com/naver/nbase-arc
     "7":
+      level: hi
       here: 네이버 로그인(외부 사이트용 OAuth), 네이버 인증서(민간 전자서명), 2단계 인증. 사내 쪽은 LINE과 인증 체계를 공유했던 것이 2023년 사건의 핵심.
       risk: OAuth 연동 결함, 계정 탈취, 공유 인증 체계(AD)를 통한 회사 간 확산. 일본 총무성은 공유 AD 중단과 독자 인증 구축을 요구한 것으로 보도됨.
       study: OAuth 2.0·OIDC 흐름, 민간 인증서 구조, AD 신뢰 관계.
@@ -193,16 +200,19 @@ deep:
         - title: Dark Reading 분석
           url: https://darkreading.com/cybersecurity-operations/japan-line-breach-clean-up-post-merger-tech-sprawl
     "8":
+      level: hi
       here: 협업 SaaS NAVER WORKS를 외부에 판매. 사내 인사 시스템 등을 LINE과 공유했던 이력.
       risk: 관계사·협력사와 공유한 사내 시스템이 경계를 무너뜨림(2023 LINE). 협업 SaaS는 고객사 데이터가 모이는 곳.
       study: 계열사 간 IT 분리, 협력사 접근 관리, 협업 SaaS 권한 모델.
       sources: []
     "9":
+      level: hi
       here: 네이버클라우드가 민간·공공(CSAP)·금융 클라우드를 운영하고 GPU 임대까지 판매. 네이버 자신이 클라우드 고객이자 사업자.
       risk: 클라우드 IAM·메타데이터·테넌트 경계. 공공 클라우드는 망분리·인증 요건이 붙어 일반 클라우드와 구조가 다름.
       study: NCP 무료 체험으로 IAM(Sub Account), VPC, Object Storage 직접 구성. CSAP 요건 읽기.
       sources: []
     "10":
+      level: mid
       here: 대규모 사내 CI/CD. GitHub naver 조직에 다수 오픈소스를 공개.
       risk: CI 비밀값, 빌드 러너 권한, 오픈소스 배포 계정 탈취(2026년 Trivy·npm 사례 참고).
       study: CI 비밀값 관리, 배포 서명, 오픈소스 유지보수자 보안.
@@ -210,6 +220,7 @@ deep:
         - title: github.com/naver
           url: https://github.com/naver
     "11":
+      level: lo
       here: 분산 추적 APM인 Pinpoint를 네이버가 만들어 오픈소스로 공개(현재 pinpoint-apm 조직).
       risk: 모니터링 도구는 전 서버 구조와 접근 정보를 가진다. 관측 시스템 침해는 내부 지도 유출.
       study: Pinpoint 설치로 분산 추적 구조 이해, 장애 대응 체계.
@@ -217,6 +228,7 @@ deep:
         - title: Pinpoint (GitHub)
           url: https://github.com/pinpoint-apm/pinpoint
     "12":
+      level: mid
       here: 자체 버그바운티와 CNA 운영. 정보보호 공시상 투자액은 늘었지만(2026년 약 660억 원) 전체 IT 투자 대비 비율은 업계 평균보다 낮다는 지적.
       risk: 보안 조직이 아무리 커도 관계사·협력사 경계(2023 LINE)에서 뚫릴 수 있음.
       study: 버그바운티 정책 문서 읽기, CNA가 하는 일, 정보보호 공시 읽는 법.
@@ -226,6 +238,7 @@ deep:
         - title: 보안 투자 비교 보도
           url: https://newstomato.com/ReadNews.aspx?no=1305704
     "13":
+      level: lo
       here: "사옥 1784: 로봇의 판단을 클라우드가 대신하는 브레인리스 로봇을 이음5G 특화망으로 연결(2022). 각 세종 GPU 클러스터는 HPC 영역."
       risk: 5G 특화망·로봇 제어 채널은 일반 IT와 다른 공격 표면. GPU 클러스터는 고가 자원이라 탈취·오남용 대상.
       study: 5G 특화망 구조, 로봇 원격 제어 보안, GPU 클러스터 스케줄러.
@@ -233,6 +246,7 @@ deep:
         - title: 1784 기술 소개
           url: https://www.navercorp.com/tech/tech1784.html
     "14":
+      level: hi
       here: 검색, 블로그·카페, 스마트스토어, 네이버페이, 웹툰, 지도, 예약, 치지직. 역할이 여러 개인 서비스가 많음.
       risk: 권한 분리(IDOR), 결제 로직, 대량 조회. 2026-07 스마트스토어 판매자 정보가 다크웹에서 거래된다는 보도에 네이버는 해킹·유출을 부인(미확인).
       study: 다중 역할 서비스의 권한 모델, 결제 흐름 위변조 점검.
@@ -240,6 +254,7 @@ deep:
         - title: 스마트스토어 의혹 보도
           url: https://inews24.com/view/wrlted/1923488
     "15":
+      level: hi
       here: 협력사(외주) 직원 PC가 2023년 사건의 시작점. 오픈소스 제공자로서 Pinpoint·ARCUS 등을 배포하는 쪽이기도 함.
       risk: 협력사·관계사 경유 침해, 의존 라이브러리 N-day, 배포 계정 탈취.
       study: 협력사 보안 관리 기준, SBOM, 패키지 서명.
@@ -247,12 +262,25 @@ deep:
         - title: LY 공지(경위)
           url: https://www.lycorp.co.jp/en/news/announcements/001003/
     "16":
+      level: mid
       here: HyperCLOVA X와 검색 속 AI 답변, GPU 임대. 엔비디아 Nemotron 기반 고도화 발표(2026).
       risk: 검색 대상 웹 문서를 통한 간접 프롬프트 인젝션, AI 도구의 권한, 학습 데이터 개인정보. 2026년 KEV에는 LiteLLM·Langflow 등 AI 인프라 도구가 다수.
       study: LLM 앱 위협 모델(MITRE ATLAS), 프롬프트 인젝션 사례 해부.
       sources:
         - title: MITRE ATLAS
           url: https://atlas.mitre.org/
+  paths:
+    - title: 2023 LINE 정보 유출
+      steps:
+        - area: "15"
+          label: 네이버클라우드 협력사 직원 PC 악성코드 감염
+        - area: "8"
+          label: 네이버클라우드와 LINE이 공유한 사내 시스템
+        - area: "7"
+          label: 공통 인증 체계(공유 AD)로 LINE 내부망 접근
+        - area: "14"
+          label: LINE 이용자·임직원 정보 유출
+      source: https://www.lycorp.co.jp/en/news/announcements/001003/
   timeline:
     - date: "2013"
       text: 각 춘천 데이터센터 가동

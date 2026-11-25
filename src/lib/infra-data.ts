@@ -79,7 +79,8 @@ export async function loadInfraData() {
       sub: d.summary,
       facts: d.facts.map((f) => [f.label, f.value, f.detail]),
       svc: d.services.map((s) => [s.name, Object.fromEntries(Object.entries(s.areas).map(([k, v]) => [k, v === 'core' ? 2 : 1]))]),
-      cards: Object.fromEntries(Object.entries(d.areas).map(([k, v]) => [k, [v.here, v.risk, v.study, v.sources.map((s) => [s.title, s.url])]])),
+      cards: Object.fromEntries(Object.entries(d.areas).map(([k, v]) => [k, [v.here, v.risk, v.study, v.sources.map((s) => [s.title, s.url]), v.level ?? null]])),
+      paths: (d.paths ?? []).map((p) => [p.title, p.steps.map((st) => [st.area, st.label]), p.source ?? null]),
       tl: d.timeline.map((t) => [t.date, t.text, t.bad ? 1 : 0]),
       use: d.use.map((u) => [u.title, u.style, u.items, u.note]),
     }];
