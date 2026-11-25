@@ -1,0 +1,7 @@
+company: naver
+oss: pinpoint
+confidence: confirmed
+checked: "2026-11-25"
+evidence:
+  - title: Pinpoint 저장소 (네이버가 만들어 공개한 APM)
+    url: https://github.com/pinpoint-apm/pinpoint

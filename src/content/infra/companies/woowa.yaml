@@ -1,0 +1,24 @@
+name: 우아한형제들 (배민)
+region: kr
+order: 5
+tag: 배달·커머스
+services:
+  - name: 배달의민족 앱
+    areas:
+      - "14"
+      - "7"
+  - name: 배민페이
+    areas:
+      - "14"
+      - "7"
+  - name: 사장님·라이더 시스템
+    areas:
+      - "14"
+      - "8"
+infra: AWS 기반 MSA, Java/Spring 중심으로 기술블로그에 다수 공개.
+incidents: []
+bounty:
+  status: unknown
+  note: 공개 버그바운티 운영 여부 확인 못 함
+tip: 고객·사장님·라이더 세 종류 사용자가 있는 서비스는 권한 분리(IDOR)가 핵심 점검 포인트.
+blog: https://techblog.woowahan.com/

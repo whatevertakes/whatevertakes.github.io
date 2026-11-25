@@ -1,0 +1,35 @@
+name: Amazon / AWS
+region: global
+order: 15
+tag: 커머스·클라우드
+services:
+  - name: Amazon 쇼핑
+    areas:
+      - "14"
+  - name: AWS(EC2·S3·IAM 등)
+    areas:
+      - "9"
+      - "4"
+      - "5"
+  - name: Prime Video
+    areas:
+      - "14"
+      - "2"
+infra: 세계 최대 퍼블릭 클라우드. 국내 빅테크·스타트업 다수가 AWS 위에서 운영.
+incidents:
+  - date: "2017"
+    text: "S3 장애: 디버깅 명령 입력 실수로 서버 대량 제거 → us-east-1 대규모 장애"
+    areas:
+      - "9"
+      - "11"
+    source: https://aws.amazon.com/message/41926/
+  - date: "2019"
+    text: "Capital One 유출: 고객의 SSRF → 메타데이터 → IAM 자격증명 (클라우드 고객 측 설정 문제)"
+    areas:
+      - "9"
+bounty:
+  status: yes
+  note: Amazon VRP 운영(HackerOne)
+  url: https://hackerone.com/amazonvrp
+tip: "공동 책임 모델: 클라우드가 뚫린 게 아니라 고객 설정이 뚫리는 사고가 대부분. IAM·메타데이터(9) 필수."
+blog: https://aws.amazon.com/blogs/architecture/

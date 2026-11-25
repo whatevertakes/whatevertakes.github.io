@@ -1,0 +1,332 @@
+name: 쿠팡
+region: kr
+order: 3
+tag: 이커머스·배달·OTT
+services:
+  - name: 로켓배송·쿠팡 앱
+    areas:
+      - "14"
+      - "7"
+  - name: 쿠팡이츠
+    areas:
+      - "14"
+  - name: 쿠팡플레이
+    areas:
+      - "14"
+      - "2"
+  - name: 쿠페이
+    areas:
+      - "14"
+      - "7"
+infra: 클라우드 기반 대규모 MSA로 알려짐(엔지니어링 블로그).
+incidents:
+  - date: 2025~2026
+    text: 개인정보 약 3,367만 건 유출(민관합동조사단, 2026-02). 퇴사한 인증 시스템 개발자가 갱신·폐기되지 않은 토큰 서명키로 접근. 배송지 목록 약 1.4억 회 조회. 개인정보위 과징금 약 6,247억 원 보도
+    areas:
+      - "7"
+      - "14"
+    source: https://www.newsis.com/view/NISX20260210_0003510149
+bounty:
+  status: unknown
+  note: 공개 버그바운티 운영 여부 확인 못 함
+tip: 서명키·비밀값의 수명 관리(발급·회전·폐기)가 무너지면 내부자 한 명이 전체 계정을 연다. 아이덴티티(7)와 시크릿 관리(10) 실무 사례.
+blog: https://medium.com/coupang-engineering
+deep:
+  summary: 쿠팡의 서비스(쇼핑·로켓배송, 쿠팡이츠, 쿠팡플레이, 쿠팡페이, 판매자 시스템, 물류센터)가 어떤 인프라 위에 있고, 영역마다 무엇이 위험하며, 실제로 어떤 사건이 있었는지를 공개 자료로 정리했습니다. 쿠팡 내부 구조를 확인한 것은 아니며 일부는 보도와 엔지니어링 블로그에서 추정했습니다.
+  facts:
+    - label: 클라우드
+      value: 2017년 AWS로 전면 이전
+      detail: 이커머스 IT 인프라 전체를 AWS로 옮겼다고 발표(2017-08). 2025-07 자체 GPU 클라우드 CIC(Coupang Intelligent Cloud) 출범
+    - label: 물리
+      value: 전국 물류센터 100여 곳
+      detail: 대구 풀필먼트센터(2023 공개)에 AGV 1천여 대·소팅봇·무인 지게차. 2021 덕평, 2026 인천 물류센터 대형 화재
+    - label: 신고 채널
+      value: 이메일 VDP + 대만 HackerOne
+      detail: 한국은 취약점 공개 정책 페이지에서 bugbounty@coupang.com 이메일 제보(포상 기준 미공개). 쿠팡 대만은 HackerOne 공개 버그바운티 운영
+    - label: 대표 사건
+      value: 2025 퇴사자 서명키 유출
+      detail: 퇴사한 인증 시스템 개발자가 갱신되지 않은 서명키로 토큰을 위조해 3,367만여 건 유출(민관합동조사단, 2026-02)
+  services:
+    - name: 쿠팡 앱·로켓배송
+      areas:
+        "2": core
+        "6": core
+        "9": core
+        "10": related
+        "11": core
+        "14": core
+    - name: 쿠팡 로그인·계정(인증 토큰)
+      areas:
+        "7": core
+        "8": related
+        "10": core
+        "11": related
+        "14": core
+    - name: 마이쿠팡(내 정보·배송지)
+      areas:
+        "5": related
+        "6": core
+        "7": core
+        "14": core
+    - name: 쿠팡이츠
+      areas:
+        "6": related
+        "7": related
+        "9": related
+        "14": core
+        "15": core
+    - name: 쿠팡플레이
+      areas:
+        "2": core
+        "5": core
+        "9": related
+        "14": related
+    - name: 쿠팡페이
+      areas:
+        "6": core
+        "7": core
+        "12": core
+        "14": core
+    - name: 윙(판매자 시스템)
+      areas:
+        "7": core
+        "14": core
+        "15": related
+    - name: 쿠팡 파트너스·광고
+      areas:
+        "6": core
+        "14": core
+        "15": core
+    - name: 물류센터·풀필먼트(CFS)
+      areas:
+        "1": core
+        "2": related
+        "13": core
+        "16": related
+    - name: CIC·ML 플랫폼
+      areas:
+        "1": related
+        "4": core
+        "9": core
+        "13": related
+        "16": core
+  areas:
+    "1":
+      level: hi
+      here: 서비스 서버는 AWS 위에 있어 자체 데이터센터 공개 자료는 찾지 못함. 대신 전국 100여 곳 물류센터가 핵심 물리 자산. 2021-06 이천 덕평 물류센터 화재는 진화까지 6일, 2026-07 인천 물류센터 화재는 약 109시간 만에 진화.
+      risk: 물류센터 화재·정전은 곧 배송 중단. 덕평 화재는 지하 2층 콘센트 스파크 등 전기적 요인이 추정 원인(보도 기준), 인천 화재 원인은 감정 중(보도 기준). 상자·비닐 같은 가연물이 많고 메자닌 구조가 화를 키웠다는 지적.
+      study: 물류센터 소방 설비(스프링클러·방화셔터), 전기 화재 감식, 클라우드 리전 장애 대비.
+      sources:
+        - title: 덕평 화재 이후 안전 대책 보도
+          url: https://www.newsis.com/view/NISX20260721_0003716860
+        - title: 인천 물류센터 화재 합동감식
+          url: https://www.newsis.com/view/NISX20260728_0003726301
+    "2":
+      level: mid
+      here: 할인 행사 같은 순간 트래픽 폭주가 2017년 클라우드 이전의 이유로 소개됨. 엔지니어링 블로그는 마이크로서비스 데이터를 높은 가용성·처리량으로 제공하는 백엔드 전략을 공개. 쿠팡플레이 스트리밍 전송 구조는 공개 자료를 찾지 못함.
+      risk: 대규모 DDoS, 이벤트 트래픽 폭주, CDN·API 게이트웨이 설정 오류. 게이트웨이가 토큰 서명만 맞으면 통과시키는 구조였다는 점이 2025 사건에서 드러남(7번 참고).
+      study: CDN·L7 로드밸런서, API 게이트웨이의 인증 위임 구조, 스트리밍 전송 프로토콜.
+      sources:
+        - title: Our backend strategy to handle massive traffic
+          url: https://medium.com/coupang-engineering/our-backend-strategy-to-handle-massive-traffic-d30cd6cc4fb2
+        - title: 쿠팡 AWS 전면 이전(2017)
+          url: https://byline.network/2017/08/10-6
+    "3":
+      level: lo
+      here: 서버는 AWS EC2 위의 Linux가 중심으로 추정. 모바일 앱 CI 빌드도 물리 장비에서 AWS EC2로 옮긴 사례가 블로그에 공개됨.
+      risk: OS·런타임 N-day 패치 지연, 빌드 머신 침해 시 앱 서명 자산 노출.
+      study: EC2 하드닝, 모바일 빌드 머신 보안, 이미지(AMI) 패치 주기.
+      sources:
+        - title: Improving the CI/CD pipeline for mobile app development
+          url: https://medium.com/coupang-engineering/improving-the-ci-cd-pipeline-for-mobile-app-development-80912546a4fd
+    "4":
+      level: mid
+      here: 2018년부터 모놀리식에서 마이크로서비스로 전환해 수백 개 서비스로 운영한다고 블로그에 공개. ML 플랫폼은 모델마다 오토스케일링 서비스로 배포하는 구조로 소개되며 Kubernetes 기반으로 추정.
+      risk: 서비스 수백 개면 서비스 간 인증과 권한 경계가 넓어짐. Kubernetes RBAC·시크릿 노출, 컨테이너 탈출 N-day.
+      study: MSA 서비스 간 인증(mTLS·서비스 토큰), Kubernetes RBAC와 시크릿 관리.
+      sources:
+        - title: Integrating Coupang platform services to a microservice architecture
+          url: https://medium.com/coupang-engineering/행복을-찾기-위한-우리의-여정-a31fc2d5a572
+        - title: Meet Coupang's Machine Learning Platform
+          url: https://medium.com/coupang-engineering/meet-coupangs-machine-learning-platform-cd00e9ccc172
+    "5":
+      level: mid
+      here: 페타바이트급 데이터 플랫폼을 블로그에 공개. 앱 접속 기록은 6개월 단위로 보관했다고 보도됨. 2025-11 자료보전 명령 뒤에도 자동 삭제 정책을 바로 바꾸지 않아 2025-05-23~06-02 앱 로그 11일치가 사라짐(과기정통부 발표 보도).
+      risk: 로그 보존 기간과 삭제 정책이 사고 조사 범위를 정함. 정부는 수사 의뢰와 과태료 처분. 백업·보존 정책이 법적 의무와 어긋나면 그 자체가 위반이 됨.
+      study: 접속기록 보관 의무(개인정보 안전성 확보조치 기준), 로그 보존·법적 보전(legal hold) 설계.
+      sources:
+        - title: 자료보전명령 의혹 수사 보도
+          url: https://www.mt.co.kr/society/2026/02/11/2026021109482538405
+        - title: Data platform 2022
+          url: https://medium.com/coupang-engineering/data-platform-2022-global-expansion-in-petabytes-3dbbbf27f6fe
+    "6":
+      level: hi
+      here: 캐시 계층 하나가 60~100개 노드로 분당 최대 1억 요청을 처리한다고 블로그에 공개. 광고 DB에는 쿠팡 파트너스 광고가 실린 타사 사이트·앱 방문 기록(URL·IP·접속 일시)이 기기 식별자·회원번호와 함께 저장됨(개인정보위 판단).
+      risk: 식별자와 결합된 행동 데이터는 그 자체로 개인정보. 개인정보위는 약 1,117만 명의 타사 활동기록 무단 수집에 약 2,011억 원 과징금 부과. 캐시·DB 대량 조회는 유출 규모를 키움.
+      study: 캐시 계층 설계와 장애 대응, 개인정보 결합·가명처리, 광고 데이터 수집 동의 구조.
+      sources:
+        - title: Lessons learned from handling massive traffic with cache
+          url: https://medium.com/coupang-engineering/lessons-learned-from-operating-our-data-serving-layer-4e9e4f68fe85
+        - title: 타사 온라인 활동기록 무단 저장 보도
+          url: https://www.newsis.com/view/NISX20260611_0003665252
+    "7":
+      level: hi
+      here: 이용자 인증 시스템이 서명키로 전자 출입증(인증 토큰)을 발급하고, 관문(게이트웨이) 서버는 서명이 맞으면 정상 접근으로 허용하는 구조였다고 발표됨. 퇴사한 개발자가 재직 중 다루던 서명키로 퇴사 후 토큰을 위조해 정상 인증을 우회.
+      risk: 서명키 하나가 전 계정의 문을 엶. 키 회전·폐기가 없으면 퇴사자도 계속 유효한 토큰을 만들 수 있음. 2023 윙 사고도 판매자 로그인 인증 계층 문제(15번).
+      study: JWT 등 서명 토큰 구조, 키 회전(kid)·폐기, 토큰 발급 이상 탐지, 게이트웨이 인증 위임.
+      sources:
+        - title: 서명키 하드코딩 탓에 갱신 못해(보안뉴스)
+          url: https://m.boannews.com/html/detail.html?idx=142059
+        - title: 조사단이 밝힌 쿠팡의 잘못
+          url: https://www.mt.co.kr/tech/2026/02/10/2026021013535454383
+    "8":
+      level: hi
+      here: 조사단은 현직 개발자 노트북에서도 서명키가 하드코딩된 채 저장된 것을 확인했다고 발표. 키는 키 관리 시스템에만 두라는 내부 규정이 있었으나 지켜지지 않음(보도 기준).
+      risk: 개발자 단말이 비밀값 저장소가 되면 단말 분실·퇴사·악성코드가 곧 키 유출. 퇴사 절차(오프보딩)에 키·권한 회수가 없으면 내부자 위협이 장기화.
+      study: 오프보딩 체크리스트(권한·키 회수), 개발자 단말 시크릿 스캔, 내부자 위협 모델.
+      sources:
+        - title: 퇴사자가 로그인 키 따로 노트북 저장
+          url: https://www.mt.co.kr/tech/2026/02/10/2026021013535454383
+    "9":
+      level: mid
+      here: 2017년 IT 인프라 전체를 AWS로 옮겼고, 이후 AWS 비용 최적화 사례를 블로그에 공개. 2025-07 자체 GPU 클라우드 CIC를 출범하고 외부 클라우드 사업 진출도 보도됨.
+      risk: 클라우드 IAM·키 관리(KMS)·메타데이터 노출. 클라우드 사업자를 겸하면 테넌트 격리 책임이 추가됨.
+      study: AWS IAM 최소 권한, KMS·Secrets Manager로 서명키 보관, 클라우드 비용·권한 거버넌스.
+      sources:
+        - title: 쿠팡, IT인프라 전체를 AWS로 이전
+          url: https://byline.network/2017/08/10-6
+        - title: Cloud expenditure optimization for cost efficiency
+          url: https://medium.com/coupang-engineering/cloud-expenditure-optimization-for-cost-efficiency-44e9bea3d91b
+        - title: 쿠팡 클라우드 시장 진출 보도
+          url: https://byline.network/2025/07/02_29182773/
+    "10":
+      level: hi
+      here: 마이크로서비스 전환 때 클라우드 기반 블루그린 배포 체계를 만들었다고 블로그에 공개. 2025 사건에서는 서명키를 보안 저장소가 아니라 소스코드에 넣어 두어, 키를 바꾸려면 코드를 고쳐야 했기에 퇴사자가 생겨도 갱신하지 않은 것으로 설명됨(과기정통부 설명 보도).
+      risk: 소스코드 속 비밀값은 저장소 접근자 모두에게 열림. 2026-10-09 새벽 쿠팡·쿠팡이츠·쿠팡플레이가 약 2시간 접속 장애를 겪었고 쿠팡은 서비스 업그레이드 중 오류라고 설명(해킹은 부인).
+      study: 시크릿 스캐닝, 코드와 키 분리(시크릿 매니저), 무중단 배포와 롤백.
+      sources:
+        - title: Integrating Coupang platform services to a microservice architecture
+          url: https://medium.com/coupang-engineering/행복을-찾기-위한-우리의-여정-a31fc2d5a572
+        - title: 서명키 하드코딩(보안뉴스)
+          url: https://m.boannews.com/html/detail.html?idx=142059
+        - title: 2026-10 접속 장애·보상
+          url: https://news.mtn.co.kr/news-detail/2026100916342654986
+    "11":
+      level: hi
+      here: 위조 토큰으로 한 접근이 2025-04-14부터 11-08까지 이어졌는데도 자체 탐지하지 못함. 배송지 목록 페이지가 약 1억 4,805만 회 조회됨. 쿠팡은 처음 4,536개 계정으로 신고했다가 11-29 약 3,370만 개로 정정.
+      risk: 정상 토큰처럼 보이는 대량 조회는 서명 검증만으로는 못 잡음. 조사단은 인지 후 24시간 내 신고 의무 위반으로 판단(보도 기준).
+      study: 계정별 조회량 이상 탐지(UEBA), 침해 신고 의무와 타임라인, 사고 범위 산정 방법.
+      sources:
+        - title: 합동조사단 결과(뉴시스)
+          url: https://mobile.newsis.com/view/NISX20260210_0003510149
+        - title: 3,370만 계정 노출 확인
+          url: https://mobile.newsis.com/view/NISX20251201_0003423905
+    "12":
+      level: hi
+      here: 정보보호 투자액 약 1,349억 원, 전담인력 약 370명(2026 공시, 보도 기준)으로 크게 늘었지만 IT 투자 대비 비중 5.2%는 공시 기업 평균보다 낮다는 보도. 한국은 이메일 VDP, 대만은 HackerOne 공개 버그바운티.
+      risk: 개인정보위는 2026-06 고도의 해킹이 아니라 기본 안전조치 소홀로 보고 과징금 약 6,246억 원(보도에 따라 6,247억 원)을 부과하고 조사 방해로 고발 결정. 2026-11 법원은 일부 처분 집행정지를 인용(보도 기준).
+      study: 개인정보 안전성 확보조치 기준, 과징금 산정 구조, 정보보호 공시 읽는 법.
+      sources:
+        - title: 쿠팡 과징금 6,247억 원
+          url: https://www.mt.co.kr/article/2026061109363411664
+        - title: 쿠팡 보안 투자 역대 최대
+          url: https://www.ddaily.co.kr/page/view/2026063015324088222
+        - title: 쿠팡 취약점 공개 정책(VDP)
+          url: https://www.coupang.com/np/policies/vdp
+    "13":
+      level: mid
+      here: "대구 풀필먼트센터: 바닥 QR코드를 따라 선반을 옮기는 AGV 1천여 대, 운송장 바코드로 분류하는 소팅봇, 무인 지게차. 쿠팡은 이를 전국 물류센터로 퍼뜨릴 테스트베드로 소개."
+      risk: 물류 로봇·컨베이어 제어망(OT)이 IT망과 섞이면 랜섬웨어 한 번에 출고가 멈춤. 로봇 관제 서버와 무선망이 공격 표면(쿠팡 사건은 확인되지 않음).
+      study: 물류 자동화 OT 구조, IT/OT 망분리, 산업용 무선·AGV 관제 보안.
+      sources:
+        - title: 아시아 최대 규모 대구 풀필먼트센터 공개
+          url: https://zdnet.co.kr/view/?no=20230207082554
+        - title: 수백 대 소팅봇 르포
+          url: https://www.etnews.com/20230207000003
+    "14":
+      level: hi
+      here: 쇼핑 앱, 마이쿠팡, 쿠팡이츠, 쿠팡플레이, 쿠팡페이, 판매자용 윙. 2025 사건에서는 '내 정보 수정' 페이지와 배송지 목록(이름·전화번호·주소, 일부 공동현관 비밀번호, 보도 기준)이 대량 조회됨.
+      risk: 2021-10 앱 홈 화면에 타인 이름·주소 노출(약 31만 건 추정), 2023-12 윙에서 다른 판매자에게 주문자·수취인 정보 노출, 쿠팡이츠 API가 배달원 실명·번호를 음식점에 전송. 화면·API 단위 권한 분리가 반복된 약점.
+      study: IDOR와 객체 단위 인가, API 응답 최소화, 캐시로 인한 타인 정보 노출 유형.
+      sources:
+        - title: 2021-10 쿠팡 앱 타인 정보 노출
+          url: https://mobile.newsis.com/view/NISX20211028_0001629892
+        - title: 2023-12 윙 타 판매자 정보 노출
+          url: https://byline.network/2023/12/12-272/
+        - title: 배송지·현관 비번까지(보안뉴스)
+          url: https://m.boannews.com/html/detail.html?idx=142046
+    "15":
+      level: mid
+      here: 윙 사고 원인은 판매자 로그인 인증에 쓴 오픈소스 프로그램의 '네트워크 실패 시 자동 재연결' 옵션을 2021-05부터 켜 둔 것으로 지목됨. 쿠팡이츠 배달원 정보는 외부 주문관리 시스템(오터코리아)을 거쳐 음식점에 노출. 쿠팡 파트너스 일부 광고 파트너는 '납치 광고'를 운영.
+      risk: 오픈소스 설정값, 연동 협력사 화면, 광고 파트너 행위가 모두 쿠팡의 책임으로 돌아옴. 개인정보위는 협력사 관리·감독 소홀도 지적.
+      study: 오픈소스 컴포넌트 설정 검토, 연동 API 데이터 최소화, 제휴·광고 파트너 관리.
+      sources:
+        - title: 배달원·고객 정보 15만 건, 과징금 15억 8,865만 원
+          url: https://m.boannews.com/html/detail.html?idx=134767
+        - title: 쿠팡 파트너스 활동기록 수집 보도
+          url: https://mobile.newsis.com/view/NISX20260611_0003665252
+    "16":
+      level: mid
+      here: 검색·추천 모델용 ML 플랫폼을 블로그에 공개. 2025-07 CIC를 출범하고 2026-03 엔비디아 DGX SuperPOD 기반 'AI 팩토리' 협력을 발표. 물류센터 스케줄링·적재 최적화에 쓰며 GPU 사용률이 65%에서 95%로 올랐다는 회사 주장.
+      risk: GPU 클러스터·노트북 환경의 자격 증명 노출, 학습 데이터 속 개인정보, 셀프서비스 플랫폼의 권한 경계.
+      study: ML 플랫폼(노트북·파이프라인) 권한 모델, GPU 클러스터 멀티 테넌시, 학습 데이터 개인정보 처리.
+      sources:
+        - title: Meet Coupang's Machine Learning Platform
+          url: https://medium.com/coupang-engineering/meet-coupangs-machine-learning-platform-cd00e9ccc172
+        - title: Coupang NVIDIA AI Factory 발표
+          url: https://www.businesswire.com/news/home/20260317974705/en/Coupang-NVIDIA-Collaboration-on-AI-Factory-Is-Powering-the-Future-of-E-Commerce-Logistics
+  paths:
+    - title: 2025 퇴사자 서명키 유출(3,367만 건)
+      steps:
+        - { area: "8", label: 재직 중 서명키 확보·개발자 노트북에 하드코딩 }
+        - { area: "10", label: 소스코드 속 키라 퇴사 후에도 미회전 }
+        - { area: "7", label: 위조 토큰이 게이트웨이 인증 통과 }
+        - { area: "14", label: 내 정보·배송지 목록 대량 조회 }
+        - { area: "11", label: 7개월 미탐지, 로그 일부 삭제 }
+      source: https://mobile.newsis.com/view/NISX20260210_0003510149
+    - title: 2023 윙 판매자 시스템 정보 노출
+      steps:
+        - { area: "15", label: 오픈소스 인증 모듈 자동 재연결 옵션 }
+        - { area: "7", label: 판매자 로그인 인증 오류 }
+        - { area: "14", label: 다른 판매자에게 주문자·수취인 정보 노출 }
+      source: https://m.boannews.com/html/detail.html?idx=134767
+    - title: 2020~2021 쿠팡이츠 배달원 정보 전송
+      steps:
+        - { area: "14", label: 주문 API에 배달원 실명·번호 포함 }
+        - { area: "15", label: 외부 주문관리 시스템 화면에 표시 }
+        - { area: "12", label: 안심번호 정책 미이행, 통지 지연 }
+      source: https://m.boannews.com/html/detail.html?idx=134767
+  timeline:
+    - { date: "2017-08", text: "이커머스 IT 인프라 전체를 AWS로 이전 완료 발표" }
+    - { date: "2020-08", text: "핀테크 사업을 쿠팡페이 독립법인으로 분사" }
+    - { date: "2021-06", text: "이천 덕평 물류센터 화재. 진화까지 6일", bad: true }
+    - { date: "2021-10", text: "앱 개선 작업 중 홈 화면에 타인 이름·주소 노출(약 31만 건 추정)", bad: true }
+    - { date: "2021-11", text: "쿠팡이츠가 2020-08부터 배달원 약 13만 5천 명 실명·번호를 음식점에 전송한 사실 인지", bad: true }
+    - { date: "2023-12", text: "판매자 시스템 윙에서 주문자·수취인 약 2만 2천 명 정보가 다른 판매자에게 노출. 2024-11 이츠 건과 함께 과징금·과태료 약 15.9억 원", bad: true }
+    - { date: "2025-11", text: "4,536개 계정 유출 신고 후 11-29 약 3,370만 계정으로 정정. 퇴사자가 2025-04~11 위조 토큰으로 접근", bad: true }
+    - { date: "2026-02", text: "민관합동조사단 발표. 3,367만여 건 유출, 배송지 목록 1.48억 회 조회, 서명키 하드코딩·로그 삭제 지적", bad: true }
+    - { date: "2026-03", text: "엔비디아와 CIC 기반 AI 팩토리 협력 발표" }
+    - { date: "2026-06", text: "개인정보위 과징금 약 6,246억 원(유출 4,235억 + 타사 활동기록 수집 2,011억)과 고발 결정. 11월 법원이 일부 집행정지 인용(보도 기준)", bad: true }
+    - { date: "2026-07", text: "인천 물류센터 대형 화재. 약 109시간 만에 진화, 원인 감정 중(보도 기준)", bad: true }
+    - { date: "2026-10", text: "쿠팡·쿠팡이츠·쿠팡플레이 약 2시간 접속 장애. 업그레이드 중 오류라고 설명", bad: true }
+  use:
+    - title: 버그바운티로 볼 만한 곳 (범위·규칙 확인이 먼저)
+      style: ul
+      items:
+        - "<b>로그인·토큰(7):</b> 2025 사건의 핵심. 토큰 수명, 로그아웃·비밀번호 변경 후 토큰 무효화가 되는지를 자기 계정으로만 관찰."
+        - "<b>마이쿠팡·배송지(14):</b> 내 정보·배송지·주문처럼 개인 객체를 다루는 API의 객체 단위 권한(IDOR)."
+        - "<b>윙 판매자 시스템(14·7):</b> 판매자 간 데이터 경계. 2023년 실제 노출 사례가 있어 정책상 범위인지 먼저 확인."
+        - "<b>쿠팡이츠 연동 API(14·15):</b> 고객·라이더·점주 세 역할과 외부 주문관리 시스템으로 나가는 응답의 최소화."
+        - "<b>쿠팡페이 결제 흐름(14):</b> 금액·주문 상태·쿠폰 같은 비즈니스 로직. 쿠팡페이는 별도 법인이라 신고처 확인."
+        - "<b>신고 채널(12):</b> 한국은 VDP 이메일(포상 기준 미공개), 대만은 HackerOne 공개 프로그램. 어느 프로그램 범위인지부터 구분."
+      note: 다른 이용자 계정을 대상으로 하거나 데이터를 내려받·수정·삭제하는 테스트는 하지 않습니다. 범위 밖 자산과 물류센터 설비는 건드리지 않습니다.
+    - title: 이 해부로 공부하는 순서
+      style: ol
+      items:
+        - "<b>7 → 10:</b> 서명 토큰 구조와 키 회전·폐기. 2025 사건을 조사단 발표 보도로 다시 읽는다."
+        - "<b>8 → 11:</b> 퇴사자 권한 회수와 대량 조회 탐지. 왜 7개월 동안 못 잡았는지 정리한다."
+        - "<b>14 → 15:</b> 2021 앱 노출, 2023 윙, 쿠팡이츠 API 사건을 권한 분리 관점으로 비교한다."
+        - "<b>9 → 4:</b> AWS IAM·KMS와 MSA 서비스 간 인증. 엔지니어링 블로그 MSA·캐시 글을 읽는다."
+        - "<b>6 → 12:</b> 광고 활동기록 수집 제재로 개인정보 결합과 과징금 구조를 공부한다."
+        - "<b>1 → 13:</b> 물류센터 화재 두 건과 AGV·소팅봇 자동화로 물리·OT 위험을 본다."
+      note: 영역마다 블로그 글 한 편으로 마무리하면 「쿠팡 인프라 해부」 시리즈가 됩니다.

@@ -1,0 +1,24 @@
+name: SK텔레콤
+region: kr
+order: 7
+tag: 이동통신
+services:
+  - name: 이동통신(유심 인증)
+    areas:
+      - "13"
+      - "3"
+  - name: PASS 본인확인(통신 3사 공동)
+    areas:
+      - "7"
+      - "14"
+infra: 가입자 인증 서버(HSS) 등 통신 핵심망은 일반 IT와 다른 특수 인프라(13).
+incidents:
+  - date: "2025"
+    text: 가입자 인증 서버(HSS) 침해와 BPFDoor 악성코드, 유심 정보 유출. 유심 교체 대란
+    areas:
+      - "13"
+      - "3"
+bounty:
+  status: unknown
+  note: 공개 버그바운티 확인 못 함
+tip: Linux 서버 장기 잠복(3)과 통신 핵심망(13)이 만나는 사례. 탐지·포렌식 관점 공부에 좋음.

@@ -1,0 +1,27 @@
+name: 당근
+region: kr
+order: 12
+tag: 지역 커뮤니티·중고거래
+services:
+  - name: 당근 앱(중고거래·동네생활)
+    areas:
+      - "14"
+      - "7"
+  - name: 당근페이
+    areas:
+      - "14"
+      - "7"
+  - name: 당근알바·비즈프로필
+    areas:
+      - "14"
+  - name: 위치 기반 동네 인증
+    areas:
+      - "14"
+      - "7"
+infra: 클라우드 위 Kubernetes, Go·Kotlin 등 사용 사례가 기술블로그에 공개.
+incidents: []
+bounty:
+  status: unknown
+  note: 공개 버그바운티 운영 여부 확인 못 함
+tip: 위치 인증 우회, 채팅·거래·페이의 권한 분리(IDOR), 사기 악용 같은 비즈니스 로직(14)이 핵심 점검 포인트.
+blog: https://medium.com/daangn

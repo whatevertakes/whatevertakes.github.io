@@ -1,0 +1,53 @@
+name: Link check
+
+# 매주 인프라 지도 데이터와 페이지의 외부 링크를 열어 보고, 깨진 링크가 있으면
+# "link-check" 라벨 이슈 하나를 만들거나 갱신한다. 사람이 원문을 대조할 목록이 된다.
+# 403(봇 차단)과 429(요청 제한)는 사이트가 자동 접근을 막은 경우가 많아 깨진 링크로 보지 않는다.
+on:
+  schedule:
+    - cron: '41 0 * * 1'   # 매주 월요일 09:41 KST
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress --max-concurrency 8 --timeout 30 --max-retries 2
+            --accept '200..=299,403,429'
+            './src/content/infra/**/*.yaml' './src/pages/**/*.astro'
+          output: ./lychee/out.md
+          fail: false
+      - name: Write issue body
+        if: steps.lychee.outputs.exit_code != 0
+        run: |
+          {
+            echo "인프라 지도 데이터(\`src/content/infra/\`)와 페이지의 외부 링크 중 열리지 않는 것입니다. 매주 월요일 자동으로 갱신됩니다."
+            echo
+            echo "- 주소가 바뀐 기사는 새 주소로 고치고, 사라진 자료는 다른 출처로 바꾸거나 해당 주장을 \"보도 기준\"으로 낮춥니다."
+            echo "- 일시적인 오류일 수 있으니 직접 열어 확인한 뒤 고칩니다."
+            echo
+            cat ./lychee/out.md
+          } > ./lychee/issue.md
+      - name: Find open issue
+        id: find
+        if: steps.lychee.outputs.exit_code != 0
+        run: echo "number=$(gh issue list --repo "$GITHUB_REPOSITORY" --label link-check --state open --json number --jq '.[0].number // empty')" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Create or update issue
+        if: steps.lychee.outputs.exit_code != 0
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: 인프라 지도 깨진 출처 링크
+          content-filepath: ./lychee/issue.md
+          issue-number: ${{ steps.find.outputs.number }}
+          labels: link-check

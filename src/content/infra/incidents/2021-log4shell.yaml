@@ -1,0 +1,10 @@
+title: 2021 Log4Shell
+date: "2021"
+summary: 로그 라이브러리 하나가 거의 모든 Java 서비스로 확산
+areas:
+  - "6"
+recent: false
+status: reported
+sources: []
+vulns:
+  - CVE-2021-44228

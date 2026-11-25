@@ -1,0 +1,13 @@
+title: 2026 FortiBleed 자격증명 캠페인
+date: "2026"
+summary: 인터넷 노출 FortiGate·SSL VPN 대상 대입 공격으로 자격증명 대량 유출. 단일 CVE가 아니라 패치가 없음. FBI·USSS 권고(2026-10-06)
+areas:
+  - "2"
+  - "12"
+notes:
+  "12": 보안 장비 자체가 침입 입구. MFA·관리 인터페이스 비노출이 대응의 핵심
+recent: true
+status: reported
+sources:
+  - https://www.ic3.gov/CSA/2026/261006.pdf
+  - https://www.csa.gov.sg/alerts-and-advisories/advisories/ad-2026-007/

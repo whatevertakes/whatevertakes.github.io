@@ -1,0 +1,52 @@
+name: KEV sync
+
+# 매일 CISA KEV에 새로 등재된 취약점을 인프라 지도 데이터에 추가하고, 이미 있는 항목의
+# 랜섬웨어 표시와 빠진 CVSS 점수를 갱신한 뒤 PR을 연다.
+# 영역은 scripts/kev-area-rules.json 규칙으로 자동 분류하고, 사이트 빌드(스키마·참조 검사)를
+# 통과해야 PR이 열린다. 병합은 사람이 검토한 뒤에 한다.
+#
+# 저장소 설정 필요: Settings → Actions → General →
+#   "Allow GitHub Actions to create and approve pull requests" 켜기
+on:
+  schedule:
+    - cron: '17 22 * * *'   # 매일 07:17 KST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: kev-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - id: kev
+        run: node scripts/kev-sync.mjs
+        env:
+          PR_BODY: ${{ runner.temp }}/kev-sync-pr.md
+      - name: Build check
+        if: steps.kev.outputs.changed != '0'
+        run: npm run build
+      - name: Open pull request
+        if: steps.kev.outputs.changed != '0'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: kev-sync/auto
+          delete-branch: true
+          title: "KEV 동기화: 추가 ${{ steps.kev.outputs.added }}건, 갱신 ${{ steps.kev.outputs.updated }}건 (~${{ steps.kev.outputs.last_date }})"
+          body-path: ${{ runner.temp }}/kev-sync-pr.md
+          commit-message: "Sync CISA KEV through ${{ steps.kev.outputs.last_date }}"
+          add-paths: |
+            src/content/infra/vulns/*.yaml
+            scripts/kev-sync-state.json
+          labels: kev-sync

@@ -1,0 +1,10 @@
+title: 2026 Trivy 배포본 변조
+date: "2026"
+summary: 보안 스캐너 자체가 CI에서 토큰·SSH 키·클라우드 자격증명을 빼가는 통로가 됨 (KEV CVE-2026-33634)
+areas:
+  - "10"
+recent: true
+status: reported
+sources: []
+vulns:
+  - CVE-2026-33634

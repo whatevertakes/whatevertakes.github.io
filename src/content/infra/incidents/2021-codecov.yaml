@@ -1,0 +1,8 @@
+title: 2021 Codecov
+date: "2021"
+summary: 업로더 스크립트 변조 → 고객 CI 비밀값 탈취
+areas:
+  - "10"
+recent: false
+status: reported
+sources: []

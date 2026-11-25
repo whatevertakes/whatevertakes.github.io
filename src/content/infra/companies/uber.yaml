@@ -1,0 +1,29 @@
+name: Uber
+region: global
+order: 18
+tag: 모빌리티·배달
+services:
+  - name: Uber 앱
+    areas:
+      - "14"
+      - "7"
+  - name: Uber Eats
+    areas:
+      - "14"
+  - name: 사내 도구
+    areas:
+      - "8"
+      - "10"
+infra: 대규모 MSA, 사내 도구가 많음.
+incidents:
+  - date: "2022"
+    text: 외주 직원 계정 탈취 + MFA 피로 공격 → 내부 네트워크 스크립트에 하드코딩된 PAM 관리자 자격증명 → 내부 도구 다수 접근
+    areas:
+      - "7"
+      - "10"
+bounty:
+  status: yes
+  note: HackerOne에서 버그바운티 운영
+  url: https://hackerone.com/uber
+tip: MFA가 있어도 사람을 지치게 하면 뚫린다. 스크립트 속 하드코딩 비밀값(10)이 내부 확산의 열쇠.
+blog: https://www.uber.com/blog/engineering/

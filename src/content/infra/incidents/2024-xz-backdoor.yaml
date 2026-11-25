@@ -1,0 +1,10 @@
+title: 2024 xz 백도어
+date: "2024"
+summary: 유지보수자 신뢰 장악 → 배포판 SSH 인증 우회 시도, 조기 발견
+areas:
+  - "15"
+recent: false
+status: reported
+sources: []
+vulns:
+  - CVE-2024-3094

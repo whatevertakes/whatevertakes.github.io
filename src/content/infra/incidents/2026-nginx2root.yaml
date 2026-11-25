@@ -1,0 +1,19 @@
+title: nginx2root (2026-11) CVE-2026-123007 외 4건
+date: "2026"
+summary: "HTTP/2 흐름 제어 정수 언더플로(CVE-2026-123007, 공개 PoC, 작업 프로세스 권한 RCE 가능), HTTP/2 UAF(CVE-2026-123633), HTTP/3 UAF(CVE-2026-121810), DNS resolver(CVE-2026-123634), 메일 프록시(CVE-2026-113425). 수정: 1.31.9+, 1.30.7+. 임시 대응: HTTP/2 비활성화(HTTP/3 건은 별도). 11-23 기준 실제 악용 미보고, KEV 미등재"
+areas:
+  - "2"
+  - "6"
+notes:
+  "2": 리버스 프록시·로드밸런서로 쓰는 nginx의 HTTP/2·HTTP/3 처리 결함 묶음. 외부 노출 리스너가 바로 공격 표면. 수정 1.31.9+, 1.30.7+ (상세는 6번 영역)
+recent: true
+status: reported
+sources:
+  - https://www.rapid7.com/blog/post/ve-cve-2026-123007-critical-nginx-http-2-integer-underflow-leads-to-rce-fixed/
+  - https://nginx.org/en/security_advisories.html
+vulns:
+  - CVE-2026-123007
+  - CVE-2026-123633
+  - CVE-2026-121810
+  - CVE-2026-123634
+  - CVE-2026-113425

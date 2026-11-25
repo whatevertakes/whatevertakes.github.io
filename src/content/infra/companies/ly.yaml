@@ -1,0 +1,24 @@
+name: LY Corporation (LINE)
+region: global
+order: 6
+tag: 메신저 (일본, 네이버 관계사)
+services:
+  - name: LINE 메신저
+    areas:
+      - "14"
+      - "7"
+  - name: Yahoo! JAPAN
+    areas:
+      - "14"
+infra: 일본 법인이지만 네이버와 인프라·인증 체계를 일부 공유했던 것이 사건의 쟁점이 됨.
+incidents:
+  - date: "2023"
+    text: 네이버클라우드 협력사 PC 악성코드 감염 → 공유된 인증 체계를 거쳐 LINE 시스템 접근, 개인정보 수십만 건 유출. 일본 총무성 행정지도, 네이버와의 자본·시스템 관계 재검토 요구
+    areas:
+      - "7"
+      - "8"
+bounty:
+  status: unknown
+  note: LINE 시절 자체 버그바운티 운영 이력. 현재 채널은 확인 필요
+tip: 관계사·협력사와 공유한 AD·인증 체계가 경계를 무너뜨린 사례. 공급망·아이덴티티(7) 공부용.
+blog: https://techblog.lycorp.co.jp/ko

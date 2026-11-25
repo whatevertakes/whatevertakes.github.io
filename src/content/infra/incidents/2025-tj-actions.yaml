@@ -1,0 +1,10 @@
+title: 2025 tj-actions/changed-files
+date: "2025"
+summary: 인기 Action 변조 → CI 로그로 비밀값 노출
+areas:
+  - "10"
+recent: false
+status: reported
+sources: []
+vulns:
+  - CVE-2025-30066

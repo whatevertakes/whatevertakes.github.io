@@ -1,0 +1,26 @@
+name: 롯데카드
+region: kr
+order: 9
+tag: 카드·결제
+services:
+  - name: 온라인 간편결제
+    areas:
+      - "14"
+      - "6"
+  - name: 카드 앱·홈페이지
+    areas:
+      - "14"
+      - "7"
+infra: 금융권 표준(망분리, 상용 WAS·DB)에 온라인 결제 시스템이 외부 접점.
+incidents:
+  - date: "2025"
+    text: 온라인 간편결제 시스템 해킹으로 약 297만 명 정보 유출(약 28만 명은 CVC 등 포함). 결제 로그에 개인정보를 평문 저장한 것이 드러남. 개인정보위 과징금 96.2억 원(2026-03)
+    areas:
+      - "14"
+      - "11"
+      - "6"
+    source: https://mobile.newsis.com/view/NISX20260312_0003544641
+bounty:
+  status: unknown
+  note: 공개 버그바운티 확인 못 함
+tip: 로그도 데이터 저장소다. 로그에 무엇을 남기는지(11)가 유출 규모를 결정한 사례.

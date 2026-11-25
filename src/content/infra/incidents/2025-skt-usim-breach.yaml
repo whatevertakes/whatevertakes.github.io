@@ -1,0 +1,11 @@
+title: 2025 SKT 유심 정보 유출
+date: "2025"
+summary: Linux 서버 장기 잠복 악성코드, 가입자 인증 정보 유출
+areas:
+  - "3"
+  - "13"
+notes:
+  "13": 이동통신 가입자 인증 서버 관련 정보 유출
+recent: false
+status: reported
+sources: []
