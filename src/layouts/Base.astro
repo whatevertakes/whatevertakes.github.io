@@ -3,7 +3,7 @@ const path = Astro.url.pathname;
 const ko = path === '/ko/' || path.startsWith('/ko/');
 const route = ko ? path.slice(3) || '/' : path;
 const prefix = ko ? '/ko' : '';
-const { title = Astro.props.frontmatter?.title ?? 'WhateverTakes', description = Astro.props.frontmatter?.description ?? (ko ? '인프라와 취약점 탐색을 연구하는 보안 연구팀' : 'Independent security research team.') } = Astro.props;
+const { title = Astro.props.frontmatter?.title ?? 'WhateverTakes', description = Astro.props.frontmatter?.description ?? (ko ? '현대 컴퓨팅 인프라 및 소프트웨어 생태계를 연구하는 AI 기반 오펜시브 보안 연구팀' : 'AI-native offensive security research team focused on modern computing infrastructure and software ecosystems.') } = Astro.props;
 const links = [['/', ko ? '홈' : 'Home'], ['/research/', ko ? '연구' : 'Research'], ['/projects/', ko ? '프로젝트' : 'Projects'], ['/members/', ko ? '팀원' : 'Members'], ['/blog/', ko ? '블로그' : 'Blog']];
 const standard = links.some(([href]) => href === route);
 const alternate = standard ? (ko ? route : '/ko' + route) : Astro.props.frontmatter?.translation;
